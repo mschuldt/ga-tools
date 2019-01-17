@@ -6,6 +6,7 @@
 
 from .defs import *
 from .ga144 import *
+from .parse import *
 
 current_chip = None
 current_node = None
@@ -17,14 +18,8 @@ def directive(name):
         directives[name] = fn
     return decorator
 
-def read_int(i):
-    return int(next(i), 0)
-
-def read_word(i):
-    return next(i).strip().lower()
-
 def op_directive(op):
-    def fn(i):
+    def fn(_):
         current_node.compile_op(op)
     return fn
 
@@ -32,39 +27,42 @@ for op in opcodes:
     directives[op] = op_directive(op)
 
 @directive('include')
-def _include(i):
-    include_file(read_word(i))
+def _include(p):
+    include_file(p.read_word())
 
 @directive('chip')
-def _chip(i):
-    set_current_chip(read_word(i))
+def _chip(p):
+    set_current_chip(p.read_word())
+
+def node_directive(p):
+    global process_next
+    process_next = process_next_aforth
+    set_current_node(p.read_int())
 
 @directive('node')
-def _node(i):
-    global process_line
-    process_line = process_line_aforth
-    set_current_node(read_int(i))
+def _node(p):
+    node_directive(p)
 
 @directive('ASM')
-def _asm(i):
-    global process_line
+def _asm(_):
+    global process_next
     current_node.asm_node = True
-    process_line = process_line_asm
+    process_next = process_next_asm
 
 @directive(':')
-def start_def(i):
-    current_node.start_def(read_word(i))
+def start_def(p):
+    current_node.start_def(p.read_word())
 
 @directive('if')
-def _if(i):
+def _if(_):
     current_node.compile_if('if')
 
 @directive('-if')
-def _if(i):
+def _if(_):
     current_node.compile_if('-if')
 
 @directive('then')
-def _if(i):
+def _if(_):
     current_node.compile_then()
 
 def here():
@@ -72,55 +70,59 @@ def here():
     current_node.push(current_node.current_word)
 
 @directive('here')
-def _here(i):
+def _here(_):
     here()
 
 @directive('begin')
-def _begin(i):
+def _begin(_):
    here()
 
 @directive('for')
-def _for(i):
+def _for(_):
     current_node.compile_op('push')
     here()
 
 @directive('next')
-def _next(i):
+def _next(_):
     current_node.compile_next('next')
 
 @directive('unext')
-def _unext(i):
+def _unext(_):
     current_node.compile_op('unext')
     current_node.pop()
 
 @directive('end')
-def _end(i):
+def _end(_):
     current_node.compile_next('end')
 
 @directive('until')
-def _until(i):
+def _until(_):
     current_node.compile_next('if')
 
 @directive('-until')
-def __until(i):
+def __until(_):
     current_node.compile_next('-if')
 
 @directive('..')
-def _align(i):
+def _align(_):
     current_node.fill_rest_with_nops()
 
 @directive('+cy')
-def _pcy(i):
+def _pcy(_):
     current_node.fill_rest_with_nops()
     current_node.extended_arith = 0x200
 
 @directive('-cy')
-def _mcy(i):
+def _mcy(_):
     current_node.fill_rest_with_nops()
     current_node.extended_arith = 0
 
+@directive('\n')
+def _nl(_):
+    pass
+
 def compile_const_directive(const):
-    def fn(i):
+    def fn(_):
         current_node.compile_constant(const)
     return fn
 
@@ -128,7 +130,7 @@ for name, addr in named_addresses.items():
     directives[name] = compile_const_directive(addr)
 
 def compile_port_directive(port):
-    def fn(i):
+    def fn(_):
         current_node.compile_port(port)
     return fn
 
@@ -157,27 +159,45 @@ def process_number(word):
     else:
         current_node.compile_constant(n)
 
-def process_line_aforth(line):
-    i = iter(line.split())
-    for word in i:
-        w = word.strip()
-        fn = directives.get(w)
-        if fn:
-            fn(i)
-        else:
-            process_number(w)
+def process_next_aforth(parser):
+    w = parser.read_word()
+    if w is None:
+        return False
+    fn = directives.get(w)
+    if fn:
+        fn(parser)
+    else:
+        process_number(w)
+    return True
 
-def process_line_asm(line):
-    ops = line.split()
+def check_asm_exit(parser):
+    global process_next
+    w = parser.read_word()
+    if w == 'node':
+        node_directive(parser)
+        process_next = process_next_aforth
+        return True
+    if w == 'chip':
+        set_current_chip(parser.read_word())
+        process_next = process_next_aforth
+        return True
+    parser.unread()
+    return False
+
+def process_next_asm(parser):
+    if check_asm_exit(parser):
+        return True
+    ops = parser.next_line()
     if not ops:
-        return
+        return False
     current_node.asm_word(ops, add_to_node=True)
+    return True
 
-process_line = process_line_aforth
+process_next = process_next_aforth
 
-def process_include(text):
-    for line in text.split('\n'):
-        process_line(line.strip())
+def process_include(parser):
+    while process_next(parser):
+        pass
 
 def do_compile():
     for chip in chips.values():
@@ -193,9 +213,9 @@ def print_nodes():
 
 def include_file(filename):
     '''digest FILENAME, which may have recursive includes'''
-    f = open(filename)
-    process_include(f.read())
-    f.close()
+    p = Parser()
+    p.set_file(filename)
+    process_include(p)
 
 def include(filename):
     include_file(filename)
