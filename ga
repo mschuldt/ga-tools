@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+# -*- python -*-
+
+# ::::GA*
+# ::::Tools
+
+import argparse
+
+import ga_tools
+
+#print('::::GA*Tools Version', ga_tools.version)
+parser = argparse.ArgumentParser()
+parser.add_argument('file', nargs=1, help='input file')
+parser.add_argument('--bootstream',
+                    nargs=1,
+                    help='Bootstream type. Default=async')
+parser.add_argument('--port',
+                    nargs=1,
+                    help='Serial port')
+parser.add_argument('--baud',
+                    nargs=1,
+                    default=[460800],
+                    help='Serial port baud rate. Default=460800')
+parser.add_argument('--json',
+                    nargs=-1,
+                    help='Dump compiled data in json format')
+parser.add_argument('--print',
+                    nargs=-1,
+                    help='Pretty print compiled node data')
+parser.add_argument('--listen',
+                    nargs=-1,
+                    help='Wait for and print data from serial port')
+parser.add_argument('--size',
+                    nargs=-1,
+                    help='Count node ram usage')
+parser.add_argument('--version',
+                    nargs=-1,
+                    help='GA-tools version')
+args = parser.parse_args()
+
+if args.version is not None:
+    print(':::GA*Tools', ga_tools.version)
+    exit()
+
+bootstream_type = args.bootstream
+if bootstream_type is None:
+    bootstream_type = 'async'
+else:
+    bootstream_type = args.bootstream[0]
+
+print_json = args.json is not None
+print_pretty = args.print is not None
+print_size = args.size is not None
+
+ga_tools.include(args.file[0])
+ga_tools.do_compile()
+
+chips = list(ga_tools.chips.values())
+if len(chips) > 1:
+    #TODO: Support multiple chips
+    raise Exception('Multiple chips are not supported yet')
+chip = chips[0]
+
+if print_size:
+    chip.print_size()
+    exit()
+
+if print_pretty:
+    ga_tools.print_nodes()
+    exit()
+
+if print_json:
+    import json
+    bs = None
+    if args.bootstream is not None:
+        bs = bootstream_type
+    data = chip.json(bs)
+    data['version'] = ga_tools.version
+    print(json.dumps(data))
+    exit()
+
+if args.port is None:
+    Exception('--port argument is required')
+
+chip.set_serial(args.port[0], args.baud[0])
+chip.write_bootstream(bootstream_type)
+if args.listen is not None:
+    chip.serial.listen()
