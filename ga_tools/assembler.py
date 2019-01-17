@@ -227,3 +227,7 @@ def include_file(filename):
     p.set_file(filename)
     process_include(p)
 
+def include_string(string):
+    p = Parser()
+    p.set_string(string)
+    process_include(p)
