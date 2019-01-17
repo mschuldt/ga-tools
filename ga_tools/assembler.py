@@ -121,6 +121,14 @@ def _mcy(_):
 def _nl(_):
     pass
 
+@directive('(')
+def _comment(p):
+    p.skip_to(')')
+
+@directive('\\')
+def _linecomment(p):
+    p.skip_to('\n')
+
 def compile_const_directive(const):
     def fn(_):
         current_node.compile_constant(const)
