@@ -52,10 +52,10 @@ print_json = args.json is not None
 print_pretty = args.print is not None
 print_size = args.size is not None
 
-ga_tools.include(args.file[0])
+ga_tools.include_file(args.file[0])
 ga_tools.do_compile()
 
-chips = list(ga_tools.chips.values())
+chips = list(ga_tools.get_chips().values())
 if len(chips) > 1:
     #TODO: Support multiple chips
     raise Exception('Multiple chips are not supported yet')

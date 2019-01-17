@@ -62,3 +62,6 @@ class GA144:
         for coord, node in self.nodes.items():
             n = len(node.assemble())
             print(str(coord).ljust(5),str(n).ljust(5), str(n/64*100)+'%')
+
+def get_chips():
+    return chips

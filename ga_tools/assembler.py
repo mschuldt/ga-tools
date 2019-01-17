@@ -206,6 +206,8 @@ process_next = process_next_aforth
 def process_include(parser):
     while process_next(parser):
         pass
+    if current_node:
+        current_node.finish()
 
 def do_compile():
     for chip in chips.values():
@@ -225,7 +227,3 @@ def include_file(filename):
     p.set_file(filename)
     process_include(p)
 
-def include(filename):
-    include_file(filename)
-    if current_node:
-        current_node.finish()
