@@ -1,11 +1,4 @@
 
-def is_whitespace(c):
-    n = ord(c)
-    return n < 33 and n != 13 and n != 10
-
-def is_newline(c):
-    return c == '\n' or c == '\r'
-
 class Parser:
     def __init__(self):
         self.current_line = 0
@@ -35,6 +28,9 @@ class Parser:
         return self.index > self.last
 
     def read_char(self):
+        if self.unread_word == '\n':
+            self.unread_word = None
+            return '\n'
         c = self.text[self.index]
         self.index += 1
         self.current_column += 1
@@ -52,45 +48,55 @@ class Parser:
                 return
 
     def peak(self):
+        if self.unread_word:
+            return self.unread_word[0]
         return self.text[self.index]
 
-    def skip_whitespace(self):
+    def skip(self, fn):
         while True:
             if self.eof():
                 return None
-            if not is_whitespace(self.peak()):
+            c = self.peak()
+            if not fn(c):
                 break
             self.read_char()
+
+    def skip_space(self):
+        self.skip(is_space)
+
+    def skip_whitespace(self):
+        self.skip(is_whitespace)
 
     def read_word(self):
         if self.unread_word:
             w = self.unread_word
             self.unread_word = None
             return w
-        self.skip_whitespace()
+        self.skip_space()
         self.word_start_column = self.current_column
         word = []
         while True:
             if self.eof():
                 break
-            next_char = self.peak()
-            if is_newline(next_char):
+            if is_newline(self.peak()):
                 if not word:
                     self.read_char()
-                    return '\n'
+                    word = ['\n']
                 break
-            char = self.read_char()
-            if is_whitespace(char):
-                break
-            word.append(char)
+            else:
+                char = self.read_char()
+                if is_space(char):
+                    break
+                word.append(char)
         self.last_word = ''.join(word).lower() or None
         return self.last_word
 
     def read_line(self):
         line = []
+        self.skip_whitespace()
         while True:
             word = self.read_word()
-            if is_newline(word) or not word:
+            if word == '\n' or not word:
                 return line
             line.append(word)
 
@@ -99,3 +105,13 @@ class Parser:
 
     def unread(self):
         self.unread_word = self.last_word
+
+def is_space(c):
+    n = ord(c)
+    return n < 33 and n != 13 and n != 10
+
+def is_newline(c):
+    return c == '\n' or c == '\r'
+
+def is_whitespace(c):
+    return ord(c) < 33
