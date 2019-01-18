@@ -1,6 +1,4 @@
-
-::::GA*  \\
-::::Tools
+![logo](/images/logo_411x150.png)
 
 Alternative tools for the GA144 multi-computer chip using Python3.
 
