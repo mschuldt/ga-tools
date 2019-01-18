@@ -49,7 +49,7 @@ class GA144:
                 node.resolve_transfers()
                 node.resolve_calls()
 
-    def json(self, bootstream_type):
+    def json(self, bootstream_type=None):
         data = {coord:node.json() for coord, node in self.nodes.items()}
         if bootstream_type:
             bs = make_bootstream(bootstream_type, self)
