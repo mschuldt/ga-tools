@@ -171,6 +171,15 @@ class F18a:
 #            return
         if self.current_word.type == INST:
             self.fill_rest_with_nops()
+        # can't trim word from nodes yet because the last
+        # word might be the destination for an addresss node
+        #self.trim_last_word()
+        if self.asm_node:
+            if self.next_asm_symbol:
+                self.symbols[self.next_asm_symbol] = self.current_word
+        self.finished = True
+
+    def trim_last_word(self):
         if self.last_word.empty():
             if self.last_word.prev:
                 self.last_word.prev.next = None
@@ -246,7 +255,9 @@ class F18a:
         word = self.ram
         while word:
             if word.dest_word:
-                word.set_addr(word.dest_word.word_addr)
+                addr = word.dest_word.word_addr
+                assert addr
+                word.set_addr(addr)
             word = word.next
 
     def assemble_list(self, lst):

@@ -44,10 +44,12 @@ class GA144:
             if node.asm_node:
                 node.set_word_addresses()
                 node.resolve_calls()
+                node.trim_last_word()
             else:
                 node.set_word_addresses()
                 node.resolve_transfers()
                 node.resolve_calls()
+                node.trim_last_word()
 
     def json(self, bootstream_type=None):
         data = {coord:node.json() for coord, node in self.nodes.items()}

@@ -147,7 +147,7 @@ for port_index, name in enumerate(('north', 'east', 'south', 'west')):
 
 def set_current_chip(name):
     global current_chip
-    chip = chips.get(name)
+    chip = get_chips().get(name)
     if chip is None:
         chip = GA144(name)
     current_chip = chip
@@ -214,10 +214,11 @@ def process_include(parser):
         current_node.finish()
 
 def do_compile():
-    for chip in chips.values():
+    for chip in get_chips().values():
         chip.compile_nodes()
 
 def print_nodes():
+    chips = get_chips()
     print_names = len(chips) > 1
     for name, chip in chips.items():
         if print_names:
