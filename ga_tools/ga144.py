@@ -65,3 +65,7 @@ class GA144:
 
 def get_chips():
     return chips
+
+def reset():
+    global chips
+    chips = {}

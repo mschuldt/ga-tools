@@ -167,8 +167,8 @@ class F18a:
 
     def finish(self):
         # Finish assembling this node
-        if self.current_word.empty():
-            return
+#        if self.current_word.empty():
+#            return
         if self.current_word.type == INST:
             self.fill_rest_with_nops()
         if self.last_word.empty():
@@ -190,6 +190,7 @@ class F18a:
                 else:
                     word.set_op(op)
                     if op in ops_using_rest_of_word:
+                        word.fill_rest_with_nops()
                         return word
         word.fill_rest_with_nops()
         return word
@@ -199,12 +200,12 @@ class F18a:
             if ops[0] == ':':
                 self.next_asm_symbol = ops[1]
                 return None
-            w = self.new_word()
             if self.next_asm_symbol:
-                self.symbols[self.next_asm_symbol] = w
+                self.symbols[self.next_asm_symbol] = self.current_word
                 self.next_asm_symbol = None
-            return self.do_asm_word(ops, w)
-
+            asm = self.do_asm_word(ops, self.current_word)
+            self.new_word()
+            return asm
         word = self.do_asm_word(ops, Word())
         word.extended_arith = self.extended_arith
         if word.type == ADDR:

@@ -98,6 +98,9 @@ class Parser:
             word = self.read_word()
             if word == '\n' or not word:
                 return line
+            if word == '\\':
+                self.skip_to('\n')
+                return line
             line.append(word)
 
     def read_int(self):

@@ -34,7 +34,7 @@ class Word:
 
     def fill_rest_with_nops(self):
         while self.op_index < 4:
-            self.set_op(OP_NOP)
+            self.set_op(NOP)
 
     def set_op(self, op):
         self._slots[self.op_index] = get_op_i(op)

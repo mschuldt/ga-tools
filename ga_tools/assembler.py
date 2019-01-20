@@ -43,7 +43,7 @@ def node_directive(p):
 def _node(p):
     node_directive(p)
 
-@directive('ASM')
+@directive('asm')
 def _asm(_):
     global process_next
     current_node.asm_node = True
@@ -181,6 +181,8 @@ def process_next_aforth(parser):
 def check_asm_exit(parser):
     global process_next
     w = parser.read_word()
+    if w is None:
+        return False
     if w == 'node':
         node_directive(parser)
         process_next = process_next_aforth
@@ -195,9 +197,11 @@ def check_asm_exit(parser):
 def process_next_asm(parser):
     if check_asm_exit(parser):
         return True
-    ops = parser.next_line()
-    if not ops:
+    ops = parser.read_line()
+    if not ops and parser.eof():
         return False
+    if not ops: # empty line
+        return True
     current_node.asm_word(ops, add_to_node=True)
     return True
 
