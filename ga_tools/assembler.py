@@ -8,8 +8,8 @@ from .defs import *
 from .ga144 import *
 from .parse import *
 
-current_chip = None
-current_node = None
+chip = None
+node = None
 
 directives = {}
 
@@ -20,7 +20,7 @@ def directive(name):
 
 def op_directive(op):
     def fn(_):
-        current_node.compile_op(op)
+        node.compile_op(op)
     return fn
 
 for op in opcodes:
@@ -32,12 +32,12 @@ def _include(p):
 
 @directive('chip')
 def _chip(p):
-    set_current_chip(p.read_word())
+    set_chip(p.read_word())
 
 def node_directive(p):
     global process_next
     process_next = process_next_aforth
-    set_current_node(p.read_int())
+    set_node(p.read_int())
 
 @directive('node')
 def _node(p):
@@ -46,28 +46,28 @@ def _node(p):
 @directive('asm')
 def _asm(_):
     global process_next
-    current_node.asm_node = True
+    node.asm_node = True
     process_next = process_next_asm
 
 @directive(':')
 def start_def(p):
-    current_node.start_def(p.read_word())
+    node.start_def(p.read_word())
 
 @directive('if')
 def _if(_):
-    current_node.compile_if('if')
+    node.compile_if('if')
 
 @directive('-if')
 def _if(_):
-    current_node.compile_if('-if')
+    node.compile_if('-if')
 
 @directive('then')
 def _if(_):
-    current_node.compile_then()
+    node.compile_then()
 
 def here():
-    current_node.fill_rest_with_nops()
-    current_node.push(current_node.current_word)
+    node.fill_rest_with_nops()
+    node.push(node.current_word)
 
 @directive('here')
 def _here(_):
@@ -79,43 +79,43 @@ def _begin(_):
 
 @directive('for')
 def _for(_):
-    current_node.compile_op('push')
+    node.compile_op('push')
     here()
 
 @directive('next')
 def _next(_):
-    current_node.compile_next('next')
+    node.compile_next('next')
 
 @directive('unext')
 def _unext(_):
-    current_node.compile_op('unext')
-    current_node.pop()
+    node.compile_op('unext')
+    node.pop()
 
 @directive('end')
 def _end(_):
-    current_node.compile_next('end')
+    node.compile_next('end')
 
 @directive('until')
 def _until(_):
-    current_node.compile_next('if')
+    node.compile_next('if')
 
 @directive('-until')
 def __until(_):
-    current_node.compile_next('-if')
+    node.compile_next('-if')
 
 @directive('..')
 def _align(_):
-    current_node.fill_rest_with_nops()
+    node.fill_rest_with_nops()
 
 @directive('+cy')
 def _pcy(_):
-    current_node.fill_rest_with_nops()
-    current_node.extended_arith = 0x200
+    node.fill_rest_with_nops()
+    node.extended_arith = 0x200
 
 @directive('-cy')
 def _mcy(_):
-    current_node.fill_rest_with_nops()
-    current_node.extended_arith = 0
+    node.fill_rest_with_nops()
+    node.extended_arith = 0
 
 @directive('\n')
 def _nl(_):
@@ -131,7 +131,7 @@ def _linecomment(p):
 
 def compile_const_directive(const):
     def fn(_):
-        current_node.compile_constant(const)
+        node.compile_constant(const)
     return fn
 
 for name, addr in named_addresses.items():
@@ -139,41 +139,41 @@ for name, addr in named_addresses.items():
 
 def compile_port_directive(port):
     def fn(_):
-        current_node.compile_port(port)
+        node.compile_port(port)
     return fn
 
 for port_index, name in enumerate(('north', 'east', 'south', 'west')):
     directives[name] = compile_port_directive(port_index)
 
-def set_current_chip(name):
-    global current_chip
+def set_chip(name):
+    global chip
     chip = get_chips().get(name)
     if chip is None:
         chip = GA144(name)
-    current_chip = chip
+    chip = chip
 
-def set_current_node(coord):
-    global current_node
-    if not current_chip:
-        set_current_chip('__default')
-    if current_node:
-        current_node.finish()
-    current_node = current_chip.set_node(coord)
-    if current_node.finished:
+def set_node(coord):
+    global node
+    if not chip:
+        set_chip('__default')
+    if node:
+        node.finish()
+    node = chip.set_node(coord)
+    if node.finished:
         raise Exception('Repeated node {}'.format(coord))
 
 def process_number(word):
     n = parse_int(word)
     if n is None:
-        current_node.compile_call(word)
+        node.compile_call(word)
     else:
-        current_node.compile_constant(n)
+        node.compile_constant(n)
 
 def process_next_aforth(parser):
     w = parser.read_word()
     if w is None:
         return False
-    if w not in ('node', 'chip', '\n') and not current_node:
+    if w not in ('node', 'chip', '\n') and not node:
         raise Exception('node is unset')
     fn = directives.get(w)
     if fn:
@@ -195,7 +195,7 @@ def check_asm_exit(parser):
         process_next = process_next_aforth
         return True
     if w == 'chip':
-        set_current_chip(parser.read_word())
+        set_chip(parser.read_word())
         process_next = process_next_aforth
         return True
     parser.unread()
@@ -209,9 +209,9 @@ def process_next_asm(parser):
         return False
     if not ops: # empty line
         return True
-    if not current_node:
+    if not node:
         raise Exception('node is unset')
-    current_node.asm_word(ops, add_to_node=True)
+    node.asm_word(ops, add_to_node=True)
     return True
 
 process_next = process_next_aforth
@@ -219,8 +219,8 @@ process_next = process_next_aforth
 def process_include(parser):
     while process_next(parser):
         pass
-    if current_node:
-        current_node.finish()
+    if node:
+        node.finish()
 
 def do_compile():
     for chip in get_chips().values():
