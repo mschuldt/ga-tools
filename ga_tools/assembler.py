@@ -159,6 +159,8 @@ def set_current_node(coord):
     if current_node:
         current_node.finish()
     current_node = current_chip.set_node(coord)
+    if current_node.finished:
+        raise Exception('Repeated node {}'.format(coord))
 
 def process_number(word):
     n = parse_int(word)
