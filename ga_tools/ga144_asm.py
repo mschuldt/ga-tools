@@ -7,7 +7,7 @@ chips = {} # maps names to GA144 instances
 from .defs import *
 from .ga_serial import *
 from .bootstream import *
-from .f18a import *
+from .f18a_asm import *
 
 class GA144:
     def __init__(self, name):

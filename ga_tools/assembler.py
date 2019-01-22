@@ -5,7 +5,7 @@
 # GA144/F18a assembler
 
 from .defs import *
-from .ga144 import *
+from .ga144_asm import *
 from .parse import *
 
 chip = None
