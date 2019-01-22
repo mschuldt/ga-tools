@@ -36,16 +36,17 @@ class Word:
         while self.op_index < 4:
             self.set_op(NOP)
 
-    def set_op(self, op):
+    def set_op(self, op, final_slot=False):
         self._slots[self.op_index] = get_op_i(op)
-        self.op_index += 1
+        if not final_slot:
+            self.op_index += 1
 
     def set_if(self, op):
-        self._slots[self.op_index] = get_op_i(op)
+        self.set_op(op, True)
         self.type = ADDR
 
     def set_next(self, op, dest):
-        self.set_op(op)
+        self.set_op(op, True)
         self.dest_word = dest
         self.type = ADDR
 
@@ -54,7 +55,7 @@ class Word:
         self.type = CONST
 
     def set_call(self, op, name):
-        self._slots[self.op_index] = get_op_i(op)
+        self.set_op(op, True)
         self.addr_sym = name
         self.type = ADDR
 

@@ -66,12 +66,18 @@ class F18a:
         while self.current_slot != 0:
             self.add_to_next_slot('.')
 
-    def add_to_next_slot(self, op):
-        assert not self.finished
-        self.current_word.set_op(op)
+    def inc_slot(self):
+        #TODO: should not be necessary. Needed now because of methods
+        #      like Word.compile_next that add ops to word without
+        #      using F18a.add_to_next_slot
         self.current_slot += 1
         if self.current_slot == 4:
             self.new_word()
+
+    def add_to_next_slot(self, op):
+        assert not self.finished
+        self.current_word.set_op(op)
+        self.inc_slot()
         self.last_op = op
 
     def set_next_const(self, const):
@@ -130,6 +136,7 @@ class F18a:
         if self.current_slot == 3:
             self.add_to_next_slot(NOP)
         self.current_word.set_if(op)
+        self.inc_slot()
         self.push(self.current_word)
         self.new_word()
 
@@ -142,6 +149,7 @@ class F18a:
         if self.current_slot == 3:
             self.add_to_next_slot(NOP)
         self.current_word.set_next(op, self.pop())
+        self.inc_slot()
         if self.current_slot != 0:
             self.new_word()
 
