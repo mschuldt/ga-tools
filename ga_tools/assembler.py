@@ -173,6 +173,8 @@ def process_next_aforth(parser):
     w = parser.read_word()
     if w is None:
         return False
+    if w not in ('node', 'chip', '\n') and not current_node:
+        raise Exception('node is unset')
     fn = directives.get(w)
     if fn:
         fn(parser)
@@ -207,6 +209,8 @@ def process_next_asm(parser):
         return False
     if not ops: # empty line
         return True
+    if not current_node:
+        raise Exception('node is unset')
     current_node.asm_word(ops, add_to_node=True)
     return True
 
