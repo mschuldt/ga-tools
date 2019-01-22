@@ -180,7 +180,10 @@ def process_next_aforth(parser):
 
 def check_asm_exit(parser):
     global process_next
-    w = parser.read_word()
+    while True:
+        w = parser.read_word()
+        if w is None or w != '\n':
+            break
     if w is None:
         return False
     if w == 'node':
