@@ -107,10 +107,10 @@ class F18a:
             self.compile_op(READ_P)
             self.set_next_const(const)
 
-    def compile_call(self, word):
+    def compile_call(self, op, word):
         if self.current_slot == 3:
             self.fill_rest_with_nops()
-        self.current_word.set_call('call', word)
+        self.current_word.set_call(op, word)
         self.new_word()
 
     def end_boot_code(self):

@@ -51,7 +51,11 @@ def _asm(_):
 
 @directive(':')
 def start_def(p):
-    node.start_def(p.read_word())
+    name = p.read_word()
+# TODO: this check will not work if word is used before being defined
+#    if name in directives:
+#        raise Exception("name '{}' is reserved".format(name))
+    node.start_def(name)
 
 @directive('if')
 def _if(_):
@@ -162,12 +166,13 @@ def set_node(coord):
     if node.finished:
         raise Exception('Repeated node {}'.format(coord))
 
-def process_number(word):
-    n = parse_int(word)
-    if n is None:
-        node.compile_call(word)
-    else:
-        node.compile_constant(n)
+def process_call(parser, word):
+    next_word = parser.read_word()
+    if next_word == ';':
+        node.compile_call('jump', word)
+        return
+    parser.unread()
+    node.compile_call('call', word)
 
 def process_next_aforth(parser):
     w = parser.read_word()
@@ -179,7 +184,12 @@ def process_next_aforth(parser):
     if fn:
         fn(parser)
     else:
-        process_number(w)
+       n = parse_int(w)
+       if n is None:
+           process_call(parser, w)
+       else:
+           node.compile_constant(n)
+
     return True
 
 def check_asm_exit(parser):
