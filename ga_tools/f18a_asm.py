@@ -291,6 +291,42 @@ class F18a:
                 word.resolve_symbol(self.symbols)
             word = word.next
 
+    def shift_addr_words(self):
+        # Move transfer to new word if it doesn't fit.
+        # It's fast enough
+        word = self.ram
+        while word:
+            if not self.word_addr_fits(word):
+                self.shift_addr_word(word)
+                self.set_word_addresses()
+                word = self.ram
+            word = word.next
+
+    def word_addr_fits(self, word, p=None):
+        # Return True if the address WORD its in the available slots
+        if word.type != ADDR:
+            return True
+        sym = self.symbols.get(word.addr_sym)
+        dest_addr = sym.word_addr if sym else word.dest_word.word_addr
+        mask = word_address_masks[word.op_index]
+        _mask = ~mask & 0x3ffff
+        p = word.word_addr + 1 if p is None else p
+        min_dest = _mask & p
+        max_dest = (_mask & p) | (mask & dest_addr)
+        return (dest_addr >= min_dest) & (dest_addr <= max_dest)
+
+    def shift_addr_word(self, word):
+        # Creates a new word following WORD and moves the
+        # transfer to the new word.
+        new = Word()
+        new.move_addr(word)
+        word.next.prev = new
+        new.prev = word
+        new.next = word.next
+        word.next = new
+        if new.next is None:
+            self.last_word = new
+
     def print(self):
         # pretty print this node
         print('\n'+'_'*53)

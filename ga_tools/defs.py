@@ -41,6 +41,8 @@ named_addresses = { 'right': 0x1D5,
                     'side': 0x185,
                     'corner': 0x195 }
 
+word_address_masks = (0x3ff, 0xff, 0x7)
+
 NORTH = 0
 EAST = 1
 SOUTH = 2

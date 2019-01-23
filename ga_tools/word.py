@@ -62,6 +62,21 @@ class Word:
     def set_addr(self, val):
         self._addr = val | self.extended_arith
 
+    def move_addr(self, from_word):
+        # Move address and associated op in word FROM_WORD to self
+        assert from_word.type == ADDR
+        assert self.type != ADDR
+        self.type = ADDR
+        self.addr_sym = from_word.addr_sym
+        self.dest_word = from_word.dest_word
+        self._addr = from_word._addr
+        self._slots[self.op_index] = from_word._slots[from_word.op_index]
+        self.extended_arith = from_word.extended_arith
+        from_word.fill_rest_with_nops()
+        from_word.type = INST
+        from_word._addr = None
+        from_word.addr_sym = None
+
     def resolve_symbol(self, symbols):
         if type(self.addr_sym) == int:
             self.set_addr(self.addr_sym)

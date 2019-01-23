@@ -47,6 +47,7 @@ class GA144:
                 node.trim_last_word()
             else:
                 node.set_word_addresses()
+                node.shift_addr_words()
                 node.resolve_transfers()
                 node.resolve_calls()
                 node.trim_last_word()
