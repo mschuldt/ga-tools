@@ -36,7 +36,7 @@ class Bootstream:
             nodes.append(self.chip.node(coord))
         return reversed(nodes)
 
-    def node_boot_code(self, node, iport, oport, stream):
+    def node_code(self, node, iport, oport, stream):
         # IPORT stream input port. OPORT output port
         stream_len = len(stream)
         s = [node.asm_word(('call', iport))] # focusing call
@@ -49,6 +49,7 @@ class Bootstream:
         s.extend(node.asm_words(self.load_pump(len(code))))
         if code:
             s.extend(code)
+            s.extend(node.assemble_boot_code())
             s.append(node.asm_word(('jump', node.start_addr())))
         return s
 
@@ -62,7 +63,7 @@ class Bootstream:
                                    rpath+[self.path[0]]):
             iport = node.port_addr(p_out, opposite=True)
             oport = p is not None and node.port_addr(p)
-            stream = self.node_boot_code(node, iport, oport, stream)
+            stream = self.node_code(node, iport, oport, stream)
         # create the bootframe
         addr = self.start_node().port_addr(self.path[1])
         return [0xae, addr, len(stream)] + stream
