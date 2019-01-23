@@ -332,7 +332,7 @@ class F18a:
         print('      Compiled             Assembled     Disassembled')
         print('node ', self.coord, '  ASM' if self.asm_node else '')
         w = self.symbols.get('main')
-        print('P =', w.word_addr if w else 0)
+        #print('P =', w.word_addr if w else 0)
 
         def print_list(ll):
             a = 0
