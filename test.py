@@ -255,6 +255,14 @@ def run_tests():
          ''',
          {1: {'ram': [73730, 65539, 84402, 84402]}})
 
+    case('shifted-last-word',
+         '''node 601
+         io b! west a! 1 0
+         : fib over over + dup ! fib''',
+         None,
+         {601: {'ram': [19218, 349, 469, 179603, 1, 231858,
+                        135088, 154290, 73734]}})
+
 
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
