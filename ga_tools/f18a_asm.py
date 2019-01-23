@@ -136,7 +136,6 @@ class F18a:
         if self.current_slot == 3:
             self.add_to_next_slot(NOP)
         self.current_word.set_if(op)
-        self.inc_slot()
         self.push(self.current_word)
         self.new_word()
 
