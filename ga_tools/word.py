@@ -17,7 +17,9 @@ class Word:
         self.prev = None
         self.symbol = None
         self.const = None # set for number literals
-        self.op_index = 0 # current op index
+        self.op_index = 0 # Index of next empty slot
+        # If word type is ADDR, op_index will be left
+        # pointing to the last op before the address
         self.dest_word = None # forward transfer destination word
         self._addr = None # set when word contains an address
         # set to True when addr is not yet determined
