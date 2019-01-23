@@ -237,6 +237,25 @@ def run_tests():
          {1: {'ram': [191666, 98317, 153010, 153010, 182706,
                       182706, 182706, 182706, 182706, 48050, 73730,
                       73731, 150962, 231858]}})
+
+    case('call-before-def',
+         '''node 1
+         : x test test2 ;
+         : test ;
+         : test2 ;
+         ''',
+
+         '''node 1 ASM
+         call test
+         jump test2
+         : test
+         ;
+         : test2
+         ;
+         ''',
+         {1: {'ram': [73730, 65539, 84402, 84402]}})
+
+
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
