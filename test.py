@@ -223,6 +223,20 @@ def run_tests():
          None,
          {1: {'ram': [153010, 65537, 73729, 65537, 133554]}})
 
+    case('large-address',
+         '''node 1
+         push pop if
+         : test dup ;
+         : test2 dup ;
+         . .. . .. . .. . .. . ..
+         ! !b test test2
+         dup dup then or
+
+         ''',
+         None,
+         {1: {'ram': [191666, 98317, 153010, 153010, 182706,
+                      182706, 182706, 182706, 182706, 48050, 73730,
+                      73731, 150962, 231858]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
