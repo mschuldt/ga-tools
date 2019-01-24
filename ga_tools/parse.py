@@ -108,7 +108,10 @@ class Parser:
             line.append(word)
 
     def read_int(self):
-        return int(self.read_word(), 0)
+        try:
+            return int(self.read_word(), 0)
+        except ValueError as e:
+            throw_error(e)
 
     def unread(self):
         self.unread_word = self.last_word
