@@ -31,7 +31,7 @@ for op in opcodes:
 
 @directive('include')
 def _include(p):
-    include_file(p.read_word())
+    include_file(p.read_word(), False)
 
 @directive('chip')
 def _chip(p):
@@ -259,10 +259,10 @@ def process_next_asm(parser):
 
 process_next = process_next_aforth
 
-def process_include(parser):
+def process_include(parser, top_level=True):
     while process_next(parser):
         pass
-    if node:
+    if top_level and node:
         node.finish()
 
 def do_compile():
@@ -278,13 +278,13 @@ def print_nodes():
         for node in chip.nodes.values():
             node.print()
 
-def include_file(filename):
+def include_file(filename, top_level=True):
     '''digest FILENAME, which may have recursive includes'''
     p = Parser()
     p.set_file(filename)
-    process_include(p)
+    process_include(p, top_level)
 
 def include_string(string):
     p = Parser()
     p.set_string(string)
-    process_include(p)
+    process_include(p, True)
