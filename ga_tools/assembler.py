@@ -164,6 +164,22 @@ def optimize_plus(x):
     if node:
         node.auto_nop_insert = x
 
+@directive('enable_0_opt')
+def _enable_0_opt(_):
+    optimize_0(True)
+
+@directive('disable_0_opt')
+def _disable_0_opt(_):
+    optimize_0(False)
+
+@directive('enable_plus_opt')
+def _enable_plus_opt(_):
+    optimize_plus(True)
+
+@directive('disable_plus_opt')
+def _disable_plus_opt(_):
+    optimize_plus(False)
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
