@@ -20,7 +20,7 @@
                        "r-lu" "rd--" "rd-u" "rdl-" "rdlu"))
 
 ;;directives that take an argument
-(setq ga-directives-3 '("node" "org"))
+(setq ga-directives-3 '("node" "org" "include"))
 
 (setq boot-descriptors '("/b" "/a" "/io" "/p" "/stack"))
 
@@ -42,7 +42,7 @@
 (setq ga-boot-descriptor-regex (ga-make-regexp boot-descriptors))
 (setq ga-directive-regexp-3
       (concat "\\(" (mapconcat (lambda (x)
-                                 (format "%s[ ]+[a-zA-Z0-9]+" x))
+                                 (format "%s[ ]+[a-zA-Z0-9_.-]+" x))
                                ga-directives-3
                                "\\|")
               "\\)"))
@@ -108,8 +108,12 @@
 
 (defvar ga-mode-syntax-table
   (let ((table (make-syntax-table)))
+    (modify-syntax-entry ?\\ "<" table)
+    (modify-syntax-entry ?\n ">" table)
     (modify-syntax-entry ?\( "<1" table)
     (modify-syntax-entry ?\) ">4" table)
+    (modify-syntax-entry ?\: "(" table)
+    (modify-syntax-entry ?\; ")" table)
     table)
   "Syntax table in use in ga buffers")
 
@@ -148,15 +152,34 @@ Used for imenu index generation.")
 	  (setq index (cons (cons (match-string 1) (point)) index))))
     index))
 
+(defun ga-fill-paragraph (&rest args)
+  (let ((fill-paragraph-function nil)
+	(fill-paragraph-handle-comment t)
+	(comment-start "\\ ")
+	(comment-end ""))
+    (apply #'fill-paragraph args)))
+
+(defun ga-comment-region (&rest args)
+  (let ((comment-start "\\ ")
+	(comment-end ""))
+    (apply #'comment-region-default args)))
+
+(defun ga-beginning-of-defun (arg)
+  (and (re-search-backward "^\\s *: \\_<" nil t (or arg 1))
+       (beginning-of-line)))
+
 (define-derived-mode ga-mode prog-mode "ga"
   "Major mode for editing ga files"
   (setq font-lock-defaults '((ga-font-lock-keywords)))
 
   (set-syntax-table ga-mode-syntax-table)
-  (make-local-variable 'comment-start)
-  (setq comment-start "( ")
-  (setq comment-end ")")
-  (setq comment-start-skip "\\((\\*?\\|\\\\\\) *")
+  (setq-local parse-sexp-lookup-properties t)
+  (setq-local fill-paragraph-function #'ga-fill-paragraph)
+  (setq-local ga-of-defun-function #'ga-beginning-of-defun)
+  (setq-local comment-start "( ")
+  (setq-local comment-end " )")
+  (setq-local comment-start-skip "[(\\][ \t*]+")
+  (setq-local comment-region-function #'ga-comment-region)
 
   (setq imenu-create-index-function 'ga-create-index)
   (run-hooks 'ga-mode-hook)
