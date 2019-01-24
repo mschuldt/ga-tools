@@ -211,7 +211,7 @@ def process_next_aforth(parser):
     w = parser.read_word()
     if w is None:
         return False
-    if w not in ('node', 'chip', '\n') and not node:
+    if w not in ('node', 'chip', '\n', '\\', '(') and not node:
         raise Exception('node is unset')
     fn = directives.get(w)
     if fn:
