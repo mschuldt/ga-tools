@@ -10,7 +10,7 @@ import ga_tools
 
 #print('::::GA*Tools Version', ga_tools.version)
 parser = argparse.ArgumentParser()
-parser.add_argument('file', nargs=1, help='input file')
+parser.add_argument('file', nargs='?', help='input file')
 parser.add_argument('--bootstream',
                     nargs=1,
                     help='Bootstream type. Default=async')
