@@ -57,7 +57,7 @@ def start_def(p):
     name = p.read_word()
 # TODO: this check will not work if word is used before being defined
 #    if name in directives:
-#        raise Exception("name '{}' is reserved".format(name))
+#        throw_error("name '{}' is reserved".format(name))
     node.start_def(name)
 
 @directive('if')
@@ -195,7 +195,7 @@ def set_node(coord):
         node.finish()
     node = chip.set_node(coord)
     if node.finished:
-        raise Exception('Repeated node {}'.format(coord))
+        throw_error('Repeated node {}'.format(coord))
     node.compile_0_as_dup_dup_or = compile_0_as_dup_dup_or
     node.auto_nop_insert = auto_nop_insert
 
@@ -212,7 +212,7 @@ def process_next_aforth(parser):
     if w is None:
         return False
     if w not in ('node', 'chip', '\n', '\\', '(') and not node:
-        raise Exception('node is unset')
+        throw_error('node is unset')
     fn = directives.get(w)
     if fn:
         fn(parser)
@@ -253,7 +253,7 @@ def process_next_asm(parser):
     if not ops: # empty line
         return True
     if not node:
-        raise Exception('node is unset')
+        throw_error('node is unset')
     node.asm_word(ops, add_to_node=True)
     return True
 

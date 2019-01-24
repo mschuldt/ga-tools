@@ -74,7 +74,7 @@ def node_ports(coord):
 
 def check_op(op):
     if op not in op_i:
-        raise Exception('invalid op: ' + str(op))
+        throw_error('invalid op: ' + str(op))
 
 file_stack = []
 
