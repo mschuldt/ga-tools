@@ -271,8 +271,7 @@ def error(coord, asm_type, name, msg):
 def disasm_ram(node, expect):
     len_node = len(node)
     len_expect = len(expect)
-    print('____got_________________________expected____________')
-    print('ram=', node)
+    print('____got__________________________expected____________')
     for i in range(max(len_node, len_expect)):
         print(str(i).ljust(4), end='')
         if i < len_node:
@@ -285,6 +284,7 @@ def disasm_ram(node, expect):
                   ga_tools.disasm_to_str(expect[i]))
         else:
             print('Nothing')
+    print('ram=', node)
     print()
 
 def cmp_json(asm_type, name, node, expect):

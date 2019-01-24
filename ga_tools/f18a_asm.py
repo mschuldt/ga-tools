@@ -352,7 +352,7 @@ class F18a:
         if self.boot:
             print(': boot')
             print_list(self.boot)
-            print()
+            print('- '*27)
         addrs = {w.word_addr:s for s,w in self.symbols.items()}
         print_list(self.ram)
 
