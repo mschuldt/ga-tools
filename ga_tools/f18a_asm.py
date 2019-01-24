@@ -340,6 +340,8 @@ class F18a:
         length = self.count_ram()
         if n < length:
             throw_error("cannot 'org' backwards")
+        if not self.current_word.empty():
+            self.fill_rest_with_nops()
         for _ in range(n - length):
             self.new_word()
 
