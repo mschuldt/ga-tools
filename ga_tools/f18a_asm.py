@@ -336,6 +336,13 @@ class F18a:
         if new.next is None:
             self.last_word = new
 
+    def move_forward(self, n):
+        length = self.count_ram()
+        if n < length:
+            throw_error("cannot 'org' backwards")
+        for _ in range(n - length):
+            self.new_word()
+
     def print(self):
         # pretty print this node
         print('\n'+'_'*53)

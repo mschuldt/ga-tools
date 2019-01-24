@@ -180,6 +180,10 @@ def _enable_plus_opt(_):
 def _disable_plus_opt(_):
     optimize_plus(False)
 
+@directive('org')
+def _org(p):
+    node.move_forward(p.read_int())
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
