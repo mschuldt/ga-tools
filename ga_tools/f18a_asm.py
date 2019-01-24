@@ -283,9 +283,10 @@ class F18a:
         while lst:
             ret.append(lst.asm())
             lst = lst.next
-        if len(ret) > 64:
-            last = ret[64:]
-            ret = last + ret[len(last):64]
+        # # Wrap words around for greenarray aforth compatibility
+        # if len(ret) > 64:
+        #     last = ret[64:]
+        #     ret = last + ret[len(last):64]
         return ret
 
     def assemble(self):

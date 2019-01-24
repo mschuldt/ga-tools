@@ -81,7 +81,10 @@ org 0x20
 (     stop 3557F a19-1 a18-1 /we-1 /ce-1            )
 
 node 7 ( data-bus)
-org 0x20
+\ Greenarrys arrayforth wraps the words when length exceeds 64
+\ That is not supported here, so don't org out that far
+\ org 0x20
+org 29
 
 \ :: in 0x14555 lit ;
 \ :: out 0x15555 lit ;
