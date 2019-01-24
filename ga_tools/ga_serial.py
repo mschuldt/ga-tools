@@ -34,4 +34,4 @@ class GA144Serial:
                 n = self.read_n(3)
                 print(n & 0x3ffff)
             else:
-                raise Exception('unknown serial code')
+                raise Exception('unknown serial code: '+str(n))
