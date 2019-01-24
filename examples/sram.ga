@@ -1,0 +1,104 @@
+\ SRAM Control Cluster
+\ AP003  http://www.greenarraychips.com/home/documents/greg/AP003-110810-SRAM.pdf 
+
+\ sram driver nodes 7, 8, 9
+
+\  block 270:
+\    node 9 suspends while waiting for a16. it uses
+\    the two lower page bits to output an 18-bit address.
+\
+\       a16 xx.aaaa.aaaa.aaaa.aaaa
+\       p04 00.0000.0000.0000.pppp
+\       a18 aa.aaaa.aaaa.aaaa.aapp
+\
+\    the code is written to minimize/equalize the time
+\    to output the address, which must be stable
+\    when node8 stores the 'start' command            )
+
+node 9 ( sram.16 address-bus )
+org 0x20
+: main
+: start west ( right) b! .. data a! .. 0x3 ( mask)
+: cmd ( m) @b ( a16) 2* 2* over @b -if
+   - ( p04) and or ( a18) ! cmd ;
+   then ( p04) and or .. ( a18) ! cmd ;
+
+
+
+\ ( block 272:
+\    node8 is fed a stop command during start-up, then
+\    suspends while waiting for a16. after starting
+\    the read or write, it again suspends while
+\    waiting for the stop command.
+\
+\    bits 4..2 of the /possibly inverted/ page value
+\    are used 'as-is' to index into the start table,
+\    setting two address bits, write enable, and chip
+\    enable. ** note that reads and writes are swapped
+\    if the page 'overflows' into bit4, with
+\    disastrous results **
+\
+\    cmd index .lit. pin17 pin05 pin03 pin01
+\    w00 .0111 2556A a19-0 a18-0 /we-0 /ce-0
+\    r00 .0000 2556E a19-0 a18-0 /we-1 /ce-0
+\    w01 .0110 2557A a19-0 a18-1 /we-0 /ce-0
+\    r01 .0001 2557E a19-0 a18-1 /we-1 /ce-0
+\    w10 .0101 3556A a19-1 a18-0 /we-0 /ce-0
+\    r10 .0010 3556E a19-1 a18-0 /we-1 /ce-0
+\    w11 .0100 3557A a19-1 a18-1 /we-0 /ce-0
+\    r11 .0011 3557E a19-1 a18-1 /we-1 /ce-0           )
+\
+node 8 ( control-pins )
+org 0
+\ :: 'r-l- 0x1F5 lit ;  ( TODO: why?
+( 'start' pin control table 0-7)
+, 0x2556E ( r00) , 0x2557E ( r01)
+, 0x3556E ( r10) , 0x3557E ( r11)
+, 0x3557A ( w11) , 0x3556A ( w10)
+, 0x2557A ( w01) , 0x2556A ( w00)
+org 0x20
+
+: main
+: start ( 'r-l-) 0x1F5 b! io a!
+: cmd @b ( stop) ! a push 0x7 ( mask) ..
+   @b ( a16) !b @b ( +p/-p) dup !b
+   2/ 2/ and ( i3) a! .. @ ( ctrl) pop a!
+   ( start) ! cmd ;
+
+
+
+( ( block 274:
+(     node7 suspends waiting for a16, passes it and
+(     page/r/w to nodes 8 and 9, finally controlling
+(     the data transfer and timing until sending the
+(     stop command.
+(
+(     the literals needed for writing are loaded
+(     onto the stack and used circularly to save
+(     time. /read's drops are free./
+(
+(     ---- .lit. pin17 pin05 pin03 pin01
+(     stop 3557F a19-1 a18-1 /we-1 /ce-1            )
+
+node 7 ( data-bus)
+org 0x20
+
+\ :: in 0x14555 lit ;
+\ :: out 0x15555 lit ;
+\ :: stop 0x3557F lit ;
+
+: main
+: start east ( left) b! ( out) 0x15555 io data ( stop) 0x3557F
+   ( out) 0x15555 io data ( stop) 0x3557F ( in) 0x14555 io a! ( in) !
+   north ( down) a! ( stop) !b
+: cmd ( /soid/) @ ( a16 ) !b @ ( +p/-p ) -if
+
+: w16 ( /soid/p-) ( +p/-p) !b
+( /- setup + 45ns) @ ( w) a push push ( data) a!
+pop ! ( io) a! ( out) ! ( 40) 13 for unext ( stop) !b
+( -/) ( in) 0x14555 ! pop a! cmd ;
+
+: r16 ( /soid/p-) then ( +p/-p) !b
+( /- setup + 55ns) a push ( data) a!
+( io) drop ( out) drop ( 50) 40 for unext ( stop) !b ( -/ )
+@ ( w) pop a! ! cmd ;
