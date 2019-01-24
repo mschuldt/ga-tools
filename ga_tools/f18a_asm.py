@@ -273,7 +273,7 @@ class F18a:
         while word:
             if word.dest_word:
                 addr = word.dest_word.word_addr
-                assert addr
+                assert addr is not None
                 word.set_addr(addr)
             word = word.next
 
