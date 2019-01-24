@@ -84,3 +84,11 @@ def push_file(p):
 def pop_file():
     file_stack.pop(-1)
 
+def throw_error(msg):
+    if file_stack:
+        print('Compiler traceback (most recent position last):')
+        for p in file_stack:
+            p.print_location()
+        print('Exception:', msg)
+        exit()
+    raise Exception(msg)

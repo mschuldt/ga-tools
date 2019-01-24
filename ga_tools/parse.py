@@ -1,9 +1,12 @@
 
+from .defs import *
+
 class Parser:
     def __init__(self):
         self.current_line = 1
         self.current_column = 1
         self.word_start_column = 0
+        self.current_line_start = 0
         self.text = None
         self.last_word = None
         self.unread_word = None
@@ -37,6 +40,7 @@ class Parser:
         if is_newline(c):
             self.current_line += 1
             self.current_column = 1
+            self.current_line_start = self.index
         return c
 
     def skip_to(self, char):
@@ -108,6 +112,29 @@ class Parser:
 
     def unread(self):
         self.unread_word = self.last_word
+
+    def print_current_source_line(self):
+        i = self.current_line_start
+        s = []
+        while True:
+            if i > self.last:
+                break
+            c = self.text[i]
+            if is_newline(c):
+                break
+            s.append(c)
+            i += 1
+        print(''.join(s))
+
+    def print_location(self):
+        if not self.filename:
+            print('   String... position', self.index)
+        else:
+            print('   File "{}"'.format(self.filename),
+                  'line', self.current_line,
+                  'column', self.current_column)
+        print('      ',end='')
+        self.print_current_source_line()
 
 def is_space(c):
     n = ord(c)
