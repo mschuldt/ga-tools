@@ -282,7 +282,9 @@ def include_file(filename, top_level=True):
     '''digest FILENAME, which may have recursive includes'''
     p = Parser()
     p.set_file(filename)
+    push_file(p)
     process_include(p, top_level)
+    pop_file()
 
 def include_string(string):
     p = Parser()
