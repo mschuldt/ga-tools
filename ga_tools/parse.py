@@ -1,8 +1,8 @@
 
 class Parser:
     def __init__(self):
-        self.current_line = 0
-        self.current_column = 0
+        self.current_line = 1
+        self.current_column = 1
         self.word_start_column = 0
         self.text = None
         self.last_word = None
@@ -36,7 +36,7 @@ class Parser:
         self.current_column += 1
         if is_newline(c):
             self.current_line += 1
-            self.current_column = 0
+            self.current_column = 1
         return c
 
     def skip_to(self, char):
