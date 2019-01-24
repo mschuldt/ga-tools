@@ -13,6 +13,7 @@ node = None
 
 directives = {}
 
+compile_0_as_dup_dup_or = True
 def directive(name):
     def decorator(fn):
         directives[name] = fn
@@ -149,6 +150,12 @@ def compile_port_directive(port):
 for port_index, name in enumerate(('north', 'east', 'south', 'west')):
     directives[name] = compile_port_directive(port_index)
 
+def optimize_0(x):
+    global compile_0_as_dup_dup_or
+    compile_0_as_dup_dup_or = x
+    if node:
+        node.compile_0_as_dup_dup_or = x
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
@@ -165,6 +172,7 @@ def set_node(coord):
     node = chip.set_node(coord)
     if node.finished:
         raise Exception('Repeated node {}'.format(coord))
+    node.compile_0_as_dup_dup_or = compile_0_as_dup_dup_or
 
 def process_call(parser, word):
     next_word = parser.read_word()

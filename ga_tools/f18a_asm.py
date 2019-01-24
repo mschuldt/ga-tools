@@ -2,8 +2,6 @@
 from .defs import *
 from .word import *
 
-compile_0_as_dup_dup_or = True
-
 class F18a:
     def __init__(self, coord):
         #self.rom = None
@@ -23,6 +21,7 @@ class F18a:
         self.asm_node = False
         self.next_asm_symbol = None
         self.finished = False
+        self.compile_0_as_dup_dup_or = True
 
     def pop(self):
         return self.stack.pop(-1)
@@ -105,7 +104,7 @@ class F18a:
             self.fill_rest_with_nops()
 
     def compile_constant(self, const):
-        if const == 0 and compile_0_as_dup_dup_or:
+        if const == 0 and self.compile_0_as_dup_dup_or:
             self.compile_op(DUP)
             self.compile_op(DUP)
             self.compile_op(XOR)

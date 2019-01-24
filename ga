@@ -33,6 +33,9 @@ parser.add_argument('--listen',
 parser.add_argument('--size',
                     nargs=-1,
                     help='Count node ram usage')
+parser.add_argument('--disable-0-opt',
+                    nargs=-1,
+                    help="Don't compile '0' as 'dup dup or'")
 parser.add_argument('--version',
                     nargs=-1,
                     help='GA-tools version')
@@ -52,6 +55,7 @@ print_json = args.json is not None
 print_pretty = args.print is not None
 print_size = args.size is not None
 
+ga_tools.optimize_0(args.disable_0_opt is None)
 ga_tools.include_file(args.file[0])
 ga_tools.do_compile()
 
