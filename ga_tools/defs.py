@@ -26,6 +26,8 @@ last_slot_ops = frozenset([';', 'unext', '@p', '!p', '+*', '+',
 
 ops_preceded_by_nops = ('+', '+*')
 
+ops_completing_carry = ('.', 'call', ';', 'if', '-if', 'next', 'unext')
+
 ops_using_rest_of_word = (';', 'ex')
 
 named_addresses = { 'right': 0x1D5,

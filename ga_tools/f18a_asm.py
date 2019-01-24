@@ -15,7 +15,7 @@ class F18a:
         self.last_word = w
         self.current_slot = 0
         self.stack = []
-        self.last_op = None
+        self.prev_op = None
         self.boot_code = False
         self.coord = coord
         self.port_addrs = node_ports(coord)
@@ -77,8 +77,8 @@ class F18a:
     def add_to_next_slot(self, op):
         assert not self.finished
         self.current_word.set_op(op)
+        self.prev_op = op
         self.inc_slot()
-        self.last_op = op
 
     def set_next_const(self, const):
         if self.current_slot == 0:
@@ -88,10 +88,16 @@ class F18a:
             w = self.new_word(set_current=False)
             w.set_const(const)
 
+    def maybe_insert_nop(self, op):
+        if op not in ops_preceded_by_nops:
+            return
+        if self.prev_op in ops_completing_carry:
+            return
+        self.add_to_next_slot(NOP)
+
     def compile_op(self, op):
         check_op(op)
-        if op in ops_preceded_by_nops and self.last_op != NOP:
-            self.add_to_next_slot(NOP)
+        self.maybe_insert_nop(op)
         if self.current_slot == 3 and op not in last_slot_ops:
             self.add_to_next_slot(NOP)
         self.add_to_next_slot(op)
@@ -111,6 +117,7 @@ class F18a:
         if self.current_slot == 3:
             self.fill_rest_with_nops()
         self.current_word.set_call(op, word)
+        self.prev_op = op
         self.new_word()
 
     def end_boot_code(self):
@@ -136,6 +143,7 @@ class F18a:
         if self.current_slot == 3:
             self.add_to_next_slot(NOP)
         self.current_word.set_if(op)
+        self.prev_op = op
         self.push(self.current_word)
         self.new_word()
 
