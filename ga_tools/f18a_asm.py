@@ -90,7 +90,7 @@ class F18a:
 
     def compile_op(self, op):
         check_op(op)
-        if op in ops_preceded_by_nops:
+        if op in ops_preceded_by_nops and self.last_op != NOP:
             self.add_to_next_slot(NOP)
         if self.current_slot == 3 and op not in last_slot_ops:
             self.add_to_next_slot(NOP)

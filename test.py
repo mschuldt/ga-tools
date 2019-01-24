@@ -17,7 +17,7 @@ def run_tests():
 
     case('plus',
          '''node 1
-            + + + + +''',
+            + + + . + . +''',
 
          '''node 1 asm
          . + . +
@@ -157,9 +157,9 @@ def run_tests():
          . unext push
          over dup unext
          push
-         . + !p  unext
+         + !p  unext
          ''',
-         {1:{'ram':[190898, 184762, 134514, 190898, 180532]}})
+         {1:{'ram':[190898, 184762, 134514, 190898, 252274]}})
 
 
     case('aforth+asm',
