@@ -119,7 +119,7 @@ class Word:
             self._slots[self.op_index] = op
             name = ops[op]
             if name in address_required:
-                self._addr = w >> addr_shift
+                self._addr = (w >> addr_shift) & 0x1ff
                 self.type = ADDR
                 break
             self.op_index += 1
