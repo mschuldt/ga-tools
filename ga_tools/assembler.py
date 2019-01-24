@@ -14,6 +14,8 @@ node = None
 directives = {}
 
 compile_0_as_dup_dup_or = True
+auto_nop_insert = True
+
 def directive(name):
     def decorator(fn):
         directives[name] = fn
@@ -156,6 +158,12 @@ def optimize_0(x):
     if node:
         node.compile_0_as_dup_dup_or = x
 
+def optimize_plus(x):
+    global auto_nop_insert
+    auto_nop_insert = x
+    if node:
+        node.auto_nop_insert = x
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
@@ -173,6 +181,7 @@ def set_node(coord):
     if node.finished:
         raise Exception('Repeated node {}'.format(coord))
     node.compile_0_as_dup_dup_or = compile_0_as_dup_dup_or
+    node.auto_nop_insert = auto_nop_insert
 
 def process_call(parser, word):
     next_word = parser.read_word()

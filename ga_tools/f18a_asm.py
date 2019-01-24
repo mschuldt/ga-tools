@@ -22,6 +22,7 @@ class F18a:
         self.next_asm_symbol = None
         self.finished = False
         self.compile_0_as_dup_dup_or = True
+        self.auto_nop_insert = True
 
     def pop(self):
         return self.stack.pop(-1)
@@ -88,6 +89,8 @@ class F18a:
             w.set_const(const)
 
     def maybe_insert_nop(self, op):
+        if not self.auto_nop_insert:
+            return
         if op not in ops_preceded_by_nops:
             return
         if self.prev_op in ops_completing_carry:

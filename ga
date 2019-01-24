@@ -36,6 +36,9 @@ parser.add_argument('--size',
 parser.add_argument('--disable-0-opt',
                     nargs=-1,
                     help="Don't compile '0' as 'dup dup or'")
+parser.add_argument('--disable-plus-opt',
+                    nargs=-1,
+                    help="Don't auto insert nops before + or +*")
 parser.add_argument('--version',
                     nargs=-1,
                     help='GA-tools version')
@@ -56,6 +59,8 @@ print_pretty = args.print is not None
 print_size = args.size is not None
 
 ga_tools.optimize_0(args.disable_0_opt is None)
+ga_tools.optimize_plus(args.disable_plus_opt is None)
+
 ga_tools.include_file(args.file[0])
 ga_tools.do_compile()
 
