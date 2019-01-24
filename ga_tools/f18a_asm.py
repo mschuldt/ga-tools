@@ -283,6 +283,9 @@ class F18a:
         while lst:
             ret.append(lst.asm())
             lst = lst.next
+        if len(ret) > 64:
+            last = ret[64:]
+            ret = last + ret[len(last):64]
         return ret
 
     def assemble(self):
@@ -346,7 +349,9 @@ class F18a:
             self.new_word()
 
     def print(self):
-        # pretty print this node
+        # pretty print this node)
+        # TODO: -should call self.assemble since that wraps the words)
+        #       -handle the word wrapping better...
         print('\n'+'_'*53)
         print('      Compiled             Assembled     Disassembled')
         print('node ', self.coord, '  ASM' if self.asm_node else '')
