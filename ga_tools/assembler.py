@@ -188,6 +188,14 @@ def _org(p):
 def _comma(p):
     node.set_next_const(p.read_int())
 
+@directive("'")
+def _tick(p):
+    name = p.read_word()
+    word = node.symbols.get(name)
+    if not word:
+        raise_error('tick: undefined word ' + name)
+    node.push(word)
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
