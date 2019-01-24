@@ -61,7 +61,11 @@ print_size = args.size is not None
 ga_tools.optimize_0(args.disable_0_opt is None)
 ga_tools.optimize_plus(args.disable_plus_opt is None)
 
-ga_tools.include_file(args.file[0])
+if not args.file:
+    parser.print_help()
+    exit()
+
+ga_tools.include_file(args.file)
 ga_tools.do_compile()
 
 chips = list(ga_tools.get_chips().values())
