@@ -184,6 +184,10 @@ def _disable_plus_opt(_):
 def _org(p):
     node.move_forward(p.read_int())
 
+@directive(',')
+def _comma(p):
+    node.set_next_const(p.read_int())
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
