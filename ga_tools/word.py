@@ -99,6 +99,8 @@ class Word:
 
     def asm(self):
         # return assembled word
+        if self.empty():
+            return 0x134a9 # call warm
         typ = self.type
         if typ == CONST:
             w = self.const
