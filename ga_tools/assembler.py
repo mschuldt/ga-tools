@@ -305,4 +305,6 @@ def include_file(filename, top_level=True):
 def include_string(string):
     p = Parser()
     p.set_string(string)
+    push_file(p)
     process_include(p, True)
+    pop_file(p)
