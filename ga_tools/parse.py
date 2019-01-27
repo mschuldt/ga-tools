@@ -172,10 +172,32 @@ class Parser:
         self.other_nodes = []
         self.current_node = None
 
+    def expand_range(self, a, b):
+        a, b = self.to_int(a), self.to_int(b)
+        inc = 1 if a//100 == b//100 else 100
+        coord, end = min(a,b), max(a,b)
+        ret = [coord]
+        while coord != end:
+            coord += inc
+            ret.append(coord)
+        return ret
+
+    def expand_coords(self, s):
+        ret = []
+        for coord in s.split(','):
+            crange = coord.split('-')
+            if len(crange) == 1:
+                ret.append(self.to_int(crange[0]))
+            else:
+                if len(crange) != 2:
+                    msg = 'invalid node coordinate range: ' +str(crange)
+                    throw_error(msg)
+                ret.extend(self.expand_range(crange[0], crange[1]))
+        return ret
+
     def read_coord(self):
         assert not self.other_nodes
-        s = self.read_name()
-        coords = list(map(self.to_int, s.split(',')))
+        coords = self.expand_coords(self.read_name())
         if len(coords) > 1:
             self.other_nodes = coords[1:]
         return coords[0]
