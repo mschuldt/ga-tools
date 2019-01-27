@@ -280,6 +280,11 @@ class Parser:
         data = p.parse()
         self.merge_tokens(data)
 
+    def include_string(self, s):
+        self.text = tuple(s) + self.text[self.index:]
+        self.last = len(self.text) - 1
+        self.index = 0
+
     def parse(self):
         self.skip_whitespace()
         while True:
