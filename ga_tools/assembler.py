@@ -45,6 +45,14 @@ def _if(_):
 def _if(_):
     node.compile_if('-if')
 
+@directive('if:')
+def _if_label(p):
+    node.compile_call('if', p.read_word())
+
+@directive('-if:')
+def __if_label(p):
+    node.compile_call('-if', p.read_word())
+
 @directive('then')
 def _if(_):
     node.compile_then()
