@@ -202,6 +202,20 @@ class Parser:
             self.other_nodes = coords[1:]
         return coords[0]
 
+    def read_port_name(self):
+        name = self.read_name()
+        if name not in port_names:
+            throw_error('Invalid port: {}'.format(name))
+        return name
+
+    def make_wire(self):
+        from_port = self.read_port_name()
+        to_port = self.read_port_name()
+        # TODO: faster wire code - double unext with preloaded stacks
+        code = ''': boot {} a! {} a!
+        : loop 0x3ffff for @ !b unext loop'''.format(from_port, to_port)
+        self.include_string(code)
+
     def check_asm(self):
         t = self.read_token()
         if t is None:
@@ -305,6 +319,9 @@ class Parser:
                 self.new_node(True)
             if w == 'include':
                 self.include()
+                continue
+            if w == 'wire':
+                self.make_wire()
                 continue
             self.process_token(t)
         self.finish_node()
