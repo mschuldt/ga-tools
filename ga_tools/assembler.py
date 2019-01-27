@@ -256,7 +256,9 @@ def print_nodes():
     for name, chip in chips.items():
         if print_names:
             print('chip:', name)
-        for node in chip.nodes.values():
+        nodes = list(chip.nodes.values())
+        nodes.sort(key=lambda x: x.coord)
+        for node in nodes:
             node.print()
 
 def include_file(filename, top_level=True):

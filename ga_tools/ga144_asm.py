@@ -62,7 +62,9 @@ class GA144:
     def print_size(self):
         print('Node  Size  Percent')
         print('-------------------')
-        for coord, node in self.nodes.items():
+        nodes = list(self.nodes.items())
+        nodes.sort()
+        for coord, node in nodes:
             n = len(node.assemble())
             print(str(coord).ljust(5),str(n).ljust(5), str(n/64*100)+'%')
 
