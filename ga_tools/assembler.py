@@ -57,6 +57,16 @@ def __if_label(p):
 def _if(_):
     node.compile_then()
 
+@directive('while')
+def _while(_):
+    node.compile_if('if')
+    node.swap()
+
+@directive('-while')
+def __while(_):
+    node.compile_if('-if')
+    node.swap()
+
 def here():
     node.fill_rest_with_nops()
     node.push(node.current_word)

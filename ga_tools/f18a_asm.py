@@ -30,6 +30,12 @@ class F18a:
     def push(self, val):
         self.stack.append(val)
 
+    def swap(self):
+        t = self.pop()
+        s = self.pop()
+        self.push(t)
+        self.push(s)
+
     def count_ram(self):
         word = self.ram
         count = 0
