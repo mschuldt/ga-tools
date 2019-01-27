@@ -156,7 +156,7 @@ class Parser:
         # handle multiple nodes
         if self.current_node is None:
             return
-        assert self.current_coord
+        assert self.current_coord is not None
         if self.asm_line:
             assert self.asm
             self.current_node.append(self.asm_line)

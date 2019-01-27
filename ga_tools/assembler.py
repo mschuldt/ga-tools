@@ -176,7 +176,7 @@ def _tick(p):
     name = p.read_word()
     word = node.symbols.get(name)
     if not word:
-        raise_error('tick: undefined word ' + name)
+        throw_error('tick: undefined word ' + name)
     node.push(word)
 
 
@@ -189,6 +189,7 @@ def error_directive(msg):
 for word in ('include', 'chip', 'node', 'asm',
              '\n', '(', '\\'):
     directives[word] = error_directive('parser error')
+
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
