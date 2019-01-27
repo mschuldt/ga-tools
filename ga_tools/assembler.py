@@ -29,29 +29,6 @@ def op_directive(op):
 for op in opcodes:
     directives[op] = op_directive(op)
 
-@directive('include')
-def _include(p):
-    include_file(p.read_word(), False)
-
-@directive('chip')
-def _chip(p):
-    set_chip(p.read_word())
-
-def node_directive(p):
-    global process_next
-    process_next = process_next_aforth
-    set_node(p.read_int())
-
-@directive('node')
-def _node(p):
-    node_directive(p)
-
-@directive('asm')
-def _asm(_):
-    global process_next
-    node.asm_node = True
-    process_next = process_next_asm
-
 @directive(':')
 def start_def(p):
     name = p.read_word()
@@ -124,18 +101,6 @@ def _mcy(_):
     node.fill_rest_with_nops()
     node.extended_arith = 0
 
-@directive('\n')
-def _nl(_):
-    pass
-
-@directive('(')
-def _comment(p):
-    p.skip_to(')')
-
-@directive('\\')
-def _linecomment(p):
-    p.skip_to('\n')
-
 def compile_const_directive(const):
     def fn(_):
         node.compile_constant(const)
@@ -196,6 +161,16 @@ def _tick(p):
         raise_error('tick: undefined word ' + name)
     node.push(word)
 
+
+def error_directive(msg):
+    def fn(_):
+        raise_error('parser error')
+    return fn
+
+# These words should be handled by the parser
+for word in ('include', 'chip', 'node', 'asm',
+             '\n', '(', '\\'):
+    directives[word] = error_directive('parser error')
 def set_chip(name):
     global chip
     chip = get_chips().get(name)
@@ -205,81 +180,63 @@ def set_chip(name):
 
 def set_node(coord):
     global node
-    if not chip:
-        set_chip('__default')
-    if node:
-        node.finish()
+    assert chip
     node = chip.set_node(coord)
     if node.finished:
         throw_error('Repeated node {}'.format(coord))
     node.compile_0_as_dup_dup_or = compile_0_as_dup_dup_or
     node.auto_nop_insert = auto_nop_insert
 
-def process_call(parser, word):
-    next_word = parser.read_word()
+def process_call(reader, word):
+    next_word = reader.peak()
     if next_word == ';':
         node.compile_call('jump', word)
+        reader.read_word()
         return
-    parser.unread()
     node.compile_call('call', word)
 
-def process_next_aforth(parser):
-    w = parser.read_word()
-    if w is None:
-        return False
-    if w not in ('node', 'chip', '\n', '\\', '(') and not node:
-        throw_error('node is unset')
-    fn = directives.get(w)
-    if fn:
-        fn(parser)
-    else:
-       n = parse_int(w)
-       if n is None:
-           process_call(parser, w)
-       else:
-           node.compile_constant(n)
-
-    return True
-
-def check_asm_exit(parser):
-    global process_next
+def process_aforth(coord, data):
+    reader = TokenReader(data['tokens'], 'TODO')
     while True:
-        w = parser.read_word()
-        if w is None or w != '\n':
+        w = reader.read_word()
+        if not w:
             break
-    if w is None:
-        return False
-    if w == 'node':
-        node_directive(parser)
-        process_next = process_next_aforth
-        return True
-    if w == 'chip':
-        set_chip(parser.read_word())
-        process_next = process_next_aforth
-        return True
-    parser.unread()
-    return False
+        fn = directives.get(w)
+        if fn:
 
-def process_next_asm(parser):
-    if check_asm_exit(parser):
-        return True
-    ops = parser.read_line()
-    if not ops and parser.eof():
-        return False
-    if not ops: # empty line
-        return True
-    if not node:
-        throw_error('node is unset')
-    node.asm_word(ops, add_to_node=True)
-    return True
+            fn(reader)
+            continue
+        n = parse_int(w)
+        if n is None:
+            process_call(reader, w)
+        else:
+            node.compile_constant(n)
 
-process_next = process_next_aforth
+def process_asm(coord, data):
+    node.asm_node = True
+    for line in data['tokens']:
+        if type(line) is Token:
+            exit()
+        ops = [t.value for t in line]
+        node.asm_word(ops, add_to_node=True)
+
+def process_chip(nodes):
+    for coord, data in nodes.items():
+        if coord == 'global':
+            continue
+        set_node(coord)
+        #node.symbols = data['labels']
+        if data['asm']:
+            process_asm(coord, data)
+        else:
+            process_aforth(coord, data)
+        node.finish()
 
 def process_include(parser, top_level=True):
-    while process_next(parser):
-        pass
-    if top_level and node:
-        node.finish()
+    tokens = parser.parse()
+    for chip, nodes in tokens.items():
+        set_chip(chip)
+        process_chip(nodes)
 
 def do_compile():
     for chip in get_chips().values():
@@ -298,13 +255,10 @@ def include_file(filename, top_level=True):
     '''digest FILENAME, which may have recursive includes'''
     p = Parser()
     p.set_file(filename)
-    push_file(p)
     process_include(p, top_level)
-    pop_file()
+
 
 def include_string(string):
     p = Parser()
     p.set_string(string)
-    push_file(p)
     process_include(p, True)
-    pop_file(p)
