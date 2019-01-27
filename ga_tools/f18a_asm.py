@@ -349,11 +349,13 @@ class F18a:
             self.last_word = new
 
     def move_forward(self, n):
+        if not self.current_word.empty():
+            self.fill_rest_with_nops()
+        if self.boot_code:
+            self.end_boot_code()
         length = self.count_ram()
         if n < length:
             throw_error("cannot 'org' backwards")
-        if not self.current_word.empty():
-            self.fill_rest_with_nops()
         for _ in range(n - length):
             self.new_word()
 
