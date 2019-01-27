@@ -25,6 +25,8 @@ class F18a:
         self.auto_nop_insert = True
 
     def pop(self):
+        if not self.stack:
+            throw_error('assembler stack underflow')
         return self.stack.pop(-1)
 
     def push(self, val):
