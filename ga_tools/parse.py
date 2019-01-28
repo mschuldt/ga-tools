@@ -9,8 +9,65 @@ class Token:
         #self.filename = intern(filename)
         self.filename = filename
 
-class Parser:
-    def __init__(self):
+    def __repr__(self):
+        s = 'NEWLINE' if self.value == '\n' else self.value
+        return 'token({})'.format(s)
+
+class Node:
+    def __init__(self, coord):
+        self.coord = coord
+        self.asm = False
+        self.tokens = []
+        self.symbols = []
+        self.index = 0
+        self.next_token = None
+
+    def copy(self, coord):
+        node = Node(coord)
+        node.asm = self.asm
+        node.tokens = self.tokens
+        node.symbols = self.symbols
+        return node
+
+    def token_reader(self):
+        return TokenReader(self.tokens)
+
+    def finish(self):
+        pass
+
+class AforthNode(Node):
+    def __init__(self, coord):
+        super(AforthNode, self).__init__(coord)
+    def add_token(self, token):
+        v = token.value
+        if v == '\n':
+            return
+        if v == 'asm':
+            throw_error("'ASM' must come after 'node'")
+        self.tokens.append(token)
+
+class AsmNode(Node):
+    def __init__(self, coord):
+        super(AsmNode, self).__init__(coord)
+        self.asm = True
+        self.line = []
+
+    def add_token(self, token):
+        v = token.value
+        if v == '\n':
+            if self.line:
+                self.tokens.append(self.line)
+                self.line = []
+        else:
+            self.line.append(token)
+
+    def finish(self):
+        if self.line:
+            self.tokens.append(self.line)
+
+class Tokenizer:
+    def __init__(self, s, source=None):
+        self.source = source
         self.current_line = 1
         self.current_column = 1
         self.word_start_column = 0
@@ -18,32 +75,9 @@ class Parser:
         self.text = None
         self.last_word = None
         self.unread_word = None
-        self.last = 0
         self.index = 0
-        self.initialized = False
-        self.filename = None
-        self.chips = {}
-        self.current_chip = None # dictionary
-        self.current_node = None # list of tokens
-        # list of nodes that share the source of current_node
-        self.other_nodes = []
-        self.labels = []
-        self.asm_line = []
-        self.asm = False
-        self.current_coord = None
-
-    def set_string(self, s):
-        assert not self.initialized
         self.text = tuple(s)
         self.last = len(self.text) - 1
-        self.parse()
-        self.initialized = True
-
-    def set_file(self, filename):
-        f = open(filename)
-        self.set_string(f.read())
-        f.close()
-        self.filename = filename
 
     def eof(self):
         return self.index > self.last
@@ -61,18 +95,18 @@ class Parser:
             self.current_line_start = self.index
         return c
 
-    def skip_to(self, char):
+    def peak(self):
+        return self.text[self.index]
+
+    def skip_to(self, char, exclusive=False):
         while True:
             if self.eof():
                 return
             c = self.read_char()
             if c == char:
+                if exclusive:
+                    self.index -= 1
                 return
-
-    def peak(self):
-        if self.unread_word:
-            return self.unread_word[0]
-        return self.text[self.index]
 
     def skip(self, fn):
         while True:
@@ -90,10 +124,6 @@ class Parser:
         self.skip(is_whitespace)
 
     def read_token(self):
-        if self.unread_word:
-            w = self.unread_word
-            self.unread_word = None
-            return w
         self.skip_space()
         self.word_start_column = self.current_column
         word = []
@@ -114,9 +144,75 @@ class Parser:
         if value is None:
             return None
         t = Token(value, self.current_column,
-                  self.current_line, self.filename)
+                  self.current_line, self.source)
         self.last_word = t
         return t
+
+    def skip_comments(self, val):
+        if val == '(':
+            self.skip_to(')')
+            return True
+        if val == '\\':
+            self.skip_to('\n', True)
+            return True
+        return False
+
+    def tokens(self):
+        self.skip_whitespace()
+        ret = []
+        while True:
+            t = self.read_token()
+            if t is None:
+                break
+            if not self.skip_comments(t.value):
+                ret.append(t)
+        self.token_list = ret
+        return ret
+
+class Parser:
+    def __init__(self):
+        self.chips = {}
+        self.current_chip = None # dictionary
+        self.current_node = None # list of tokens
+        # list of nodes that share the source of current_node
+        self.other_nodes = []
+        self.current_node = None
+
+        self.labels = []
+
+        self.tokens = []
+        self.next_token = None
+
+    def include_string(self, s, source=None):
+        tokenizer = Tokenizer(s, source)
+        tokens = tokenizer.tokens()
+        if self.next_token:
+            self.tokens.push(self.next_token)
+        else:
+            tokens.append(None)
+        tokens.reverse()
+        self.next_token = tokens.pop()
+        self.tokens.extend(tokens)
+
+    def include_file(self, filename=None):
+        if not filename:
+            filename = self.read_name()
+        f = open(filename)
+        self.include_string(f.read(), filename)
+        f.close()
+
+    def read_token(self):
+        t = self.next_token
+        if t:
+            self.next_token = self.tokens.pop()
+        return t
+
+    def eof(self):
+        return self.next_token is None
+
+    def peak(self):
+        t = self.next_token
+        return t.value if t else t
 
     def to_int(self, s):
         try:
@@ -127,10 +223,7 @@ class Parser:
     def read_int(self):
         return self.to_int(self.read_word())
 
-    def unread(self):
-        self.unread_word = self.last_word
-
-    def read_name(self):
+    def read_name_token(self):
         while True:
             t = self.read_token()
             if t is None:
@@ -138,7 +231,11 @@ class Parser:
             name = t.value
             if name == '\n':
                 continue
-            return name
+            return t
+
+    def read_name(self):
+        t = self.read_name_token()
+        return t.value if t else None
 
     def new_chip(self, default=False):
         if default:
@@ -156,19 +253,10 @@ class Parser:
         # handle multiple nodes
         if self.current_node is None:
             return
-        assert self.current_coord is not None
-        if self.asm_line:
-            assert self.asm
-            self.current_node.append(self.asm_line)
-        data = {'tokens': self.current_node,
-                'labels': self.labels,
-                'filename': self.filename,
-                'asm': self.asm}
-        self.current_chip[self.current_coord] = data
-        for node in self.other_nodes:
-            self.current_chip[node] = data
-        self.asm = False
-        self.asm_line = []
+        node = self.current_node
+        node.finish()
+        for coord in self.other_nodes:
+            self.current_chip[coord] = node.copy(coord)
         self.other_nodes = []
         self.current_node = None
 
@@ -214,93 +302,36 @@ class Parser:
         # TODO: faster wire code - double unext with preloaded stacks
         code = ''': boot {} a! {} b!
         : loop 0x3ffff for @ !b unext loop'''.format(from_port, to_port)
-        self.include_string(code)
+        source = '<wire_{}_{}>'.format(from_port, to_port)
+        self.include_string(code, source)
 
-    def check_asm(self):
-        t = self.read_token()
-        if t is None:
-            return False
-        if t.value == 'asm':
-            self.asm = True
+    def make_node(self, coord):
+        w = self.peak()
+        if w == 'asm':
+            self.read_token() # discard 'asm'
+            return AsmNode(coord)
         else:
-            self.unread()
+            return AforthNode(coord)
 
-    def new_node(self, global_code=False):
+    def new_node(self):
+        assert self.current_chip is not None
         self.finish_node()
-        if global_code:
-            coord = 'global'
-        else:
-            coord = self.read_coord()
-        self.current_coord = coord
-        node = []
+        coord = self.read_coord()
         if coord in self.current_chip:
             throw_error('repeated node: ' + str(coord))
+        node = self.make_node(coord)
         self.current_node = node
-        self.check_asm()
+        self.current_chip[coord] = node
         return node
 
-    def process_token_aforth(self, t, v):
-        if v == '\n':
-            return
-        if v == '(':
-            self.skip_to(')')
-            return
-        if v == '\\':
-            self.skip_to('\n')
-            return
-        if v == 'asm':
-            throw_error("'ASM' must come after 'node'")
-        self.current_node.append(t)
-
-    def process_token_asm(self, t, v):
-        if v == '\\':
-            self.skip_to('\n')
-            v = '\n'
-        if v == '\n':
-            if self.asm_line:
-                self.current_node.append(self.asm_line)
-                self.asm_line = []
-        else:
-            self.asm_line.append(t)
-
-    def process_token(self, t):
-        v = t.value
-        if v == ':':
-            self.labels.append(self.read_name())
-            self.unread()
-        if self.asm:
-            self.process_token_asm(t, v)
-        else:
-            self.process_token_aforth(t, v)
-
-    def merge_tokens(self, data):
-        for chip, nodes in data.items():
-            if chip not in self.chips:
-                self.chips[chip] = nodes
-                continue
-            our_nodes = self.chips[chip]
-            for coord, data in nodes.items():
-                if coord in our_nodes:
-                    throw_error('included duplicate node: '+str(coord))
-                if coord == 'global':
-                    self.current_node.extend(data)
-                else:
-                    our_nodes[coord] = data
-
-    def include(self):
-        filename = self.read_name()
-        p = Parser()
-        p.set_file(filename)
-        data = p.parse()
-        self.merge_tokens(data)
-
-    def include_string(self, s):
-        self.text = tuple(s) + self.text[self.index:]
-        self.last = len(self.text) - 1
-        self.index = 0
+    def do_colon(self, t):
+        name = self.read_name_token()
+        node = self.current_node
+        node.symbols.append(name.value)
+        node.add_token(t)
+        node.add_token(name)
 
     def parse(self):
-        self.skip_whitespace()
         while True:
             t = self.read_token()
             if t is None:
@@ -314,16 +345,18 @@ class Parser:
             if w == 'node':
                 self.new_node()
                 continue
-            if self.current_node is None:
-                #TODO: should not be happening
-                self.new_node(True)
             if w == 'include':
-                self.include()
+                self.include_file()
                 continue
             if w == 'wire':
                 self.make_wire()
                 continue
-            self.process_token(t)
+            if w == ':':
+                self.do_colon(t)
+                continue
+            if w == '\n' and not self.current_node:
+                continue
+            self.current_node.add_token(t)
         self.finish_node()
         return self.chips
 
@@ -351,22 +384,17 @@ class Parser:
         self.print_current_source_line()
 
 class TokenReader:
-    def __init__(self, tokens, filename):
+    def __init__(self, tokens):
         self.tokens = tokens
-        self.filename = filename
         self.index = 0
         self.last = len(tokens) -1
-
-
-    def eof(self):
-        return self.index > self.last
 
     def peak(self):
         return self.read_word(True)
 
     #    def next_word(self): #TODO: rename
     def read_word(self, peak=False):
-        if self.eof():
+        if self.index > self.last:
             return None
         w = self.tokens[self.index]
         if not peak:

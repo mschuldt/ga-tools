@@ -228,7 +228,7 @@ def process_call(reader, word):
     node.compile_call('call', word)
 
 def process_aforth(coord, data):
-    reader = TokenReader(data['tokens'], 'TODO')
+    reader = data.token_reader()
     while True:
         w = reader.read_word()
         if not w:
@@ -246,7 +246,7 @@ def process_aforth(coord, data):
 
 def process_asm(coord, data):
     node.asm_node = True
-    for line in data['tokens']:
+    for line in data.tokens:
         if type(line) is Token:
             exit()
         ops = [t.value for t in line]
@@ -258,7 +258,7 @@ def process_chip(nodes):
             continue
         set_node(coord)
         #node.symbols = data['labels']
-        if data['asm']:
+        if data.asm:
             process_asm(coord, data)
         else:
             process_aforth(coord, data)
@@ -269,6 +269,17 @@ def process_include(parser, top_level=True):
     for chip, nodes in tokens.items():
         set_chip(chip)
         process_chip(nodes)
+
+def include_file(filename, top_level=True):
+    '''digest FILENAME, which may have recursive includes'''
+    p = Parser()
+    p.include_file(filename)
+    process_include(p, top_level)
+
+def include_string(string):
+    p = Parser()
+    p.include_string(string)
+    process_include(p, True)
 
 def do_compile():
     for chip in get_chips().values():
@@ -284,15 +295,3 @@ def print_nodes():
         nodes.sort(key=lambda x: x.coord)
         for node in nodes:
             node.print()
-
-def include_file(filename, top_level=True):
-    '''digest FILENAME, which may have recursive includes'''
-    p = Parser()
-    p.set_file(filename)
-    process_include(p, top_level)
-
-
-def include_string(string):
-    p = Parser()
-    p.set_string(string)
-    process_include(p, True)
