@@ -16,6 +16,8 @@ directives = {}
 compile_0_as_dup_dup_or = True
 auto_nop_insert = True
 
+baud=None
+
 def directive(name):
     def decorator(fn):
         directives[name] = fn
@@ -179,7 +181,6 @@ def _tick(p):
         throw_error('tick: undefined word ' + name)
     node.push(word)
 
-
 def error_directive(msg):
     def fn(_):
         raise_error('parser error')
@@ -189,6 +190,18 @@ def error_directive(msg):
 for word in ('include', 'chip', 'node', 'asm',
              '\n', '(', '\\'):
     directives[word] = error_directive('parser error')
+
+def set_baud(n):
+    global baud
+    baud = n
+
+@directive('baud')
+def _baud(_):
+    node.compile_constant(baud)
+
+@directive('unext_baud')
+def _unext_baud(_):
+    node.compile_constant(int((1/baud)/(2.4*10**-9)))
 
 def set_chip(name):
     global chip
