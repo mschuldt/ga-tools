@@ -57,6 +57,8 @@ class Bootstream:
         # create bootstream for all nodes except boot node
         stream = []
         path = self.path
+        if not path:
+            return stream
         rpath = list(reversed(self.path))
         for node, p, p_out in zip(self.ordered_nodes(),
                                    [None]+rpath,
@@ -65,7 +67,12 @@ class Bootstream:
             oport = p is not None and node.port_addr(p)
             stream = self.node_code(node, iport, oport, stream)
         # create the bootframe
-        addr = self.start_node().port_addr(self.path[1])
+        # boot frame format:
+        #  0  completion(jump) address
+        #  1  transfer (store) address
+        #  2  transfer size in words
+        #  3+ data words (if size != 0)
+        addr = self.start_node().port_addr(self.path[0])
         return [0xae, addr, len(stream)] + stream
 
     def tail_frame(self):
