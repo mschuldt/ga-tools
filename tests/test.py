@@ -359,6 +359,28 @@ def run_tests():
           5: {'ram': [21938, 1, 21938, 2, 73730, 18933, 1]},
           6: {'ram': [21938, 1, 2, 84402, 73730, 18933, 1]},
           3: {'ram': [133554]}})
+
+    case('rom',
+         '''node 1 warm *.17 poly
+         node 709 -dac
+         node 705 18ibits
+         node 708 18ibits
+         ''',
+         ''' node 1 ASM
+         call warm
+         call *.17
+         call poly
+         node 709 ASM
+         call -dac
+         node 705 ASM
+         call 18ibits
+         node 708 ASM
+         call 18ibits''',
+         {1: {'ram': [73897, 73904, 73898]},
+          709: {'ram': [73916]},
+          705: {'ram': [73945]},
+          708: {'ram': [73931]}})
+
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
