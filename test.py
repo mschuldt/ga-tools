@@ -263,6 +263,17 @@ def run_tests():
          {601: {'ram': [19218, 349, 469, 179603, 1, 231858,
                         135088, 154290, 73734]}})
 
+    case(',',
+         '''node 1
+         , 1 dup , 2 , 0x3 over , 4
+         ''',
+         ''' node 1 ASM
+         1
+         dup over
+         2
+         3
+         4''',
+         {1: {'ram': [1, 151474, 2, 3, 4]}})
 
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
