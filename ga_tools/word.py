@@ -138,7 +138,7 @@ class Word:
         if typ == CONST:
             return str(self.const)
         if typ == ADDR:
-            return self.inst_str() + ' ' + str(self._addr)
+            return self.inst_str() + ' ' + hex(self._addr)[2:]
         return 'Error unhandled word type'
 
 

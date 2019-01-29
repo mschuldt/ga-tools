@@ -383,7 +383,7 @@ class F18a:
                     print(':', s)
                 asm = ll.asm()
                 disasm = disasm_to_str(asm)
-                addr = str(a).ljust(5)
+                addr = hex(a)[2:].ljust(5)
                 comp = str(ll).ljust(20)
                 asm = str(asm).ljust(13)
                 print(addr, comp, asm, disasm)
