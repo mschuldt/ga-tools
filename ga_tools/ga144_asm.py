@@ -57,6 +57,7 @@ class GA144:
 
     def set_rom(self, node):
         rom = get_node_rom(node.coord)
+        rom.update(io_places)
         node.symbol_names = list(rom.keys())
         node.rom_names = list(node.symbol_names)
         for name, addr in rom.items():

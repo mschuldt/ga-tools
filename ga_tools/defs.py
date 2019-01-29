@@ -60,6 +60,22 @@ LEFT = 0x175
 IO = 0x15d
 DATA = 0x141
 
+io_places = {'---u': 0x145,
+             '--l-': 0x175,
+             '--lu': 0x165,
+             '-d--': 0x115,
+             '-d-u': 0x105,
+             '-dl-': 0x135,
+             '-dlu': 0x125,
+             'r---': 0x1D5,
+             'r--u': 0x1C5,
+             'r-l-': 0x1F5,
+             'r-lu': 0x1E5,
+             'rd--': 0x195,
+             'rd-u': 0x185,
+             'rdl-': 0x1B5,
+             'rdlu': 0x1A5}
+
 def parse_int(s):
     try:
         return int(s, 0)
