@@ -45,7 +45,7 @@ class Bootstream:
             s.extend(node.asm_words(self.port_pump(oport, stream_len)))
             s.extend(stream)
         # then load this nodes code into ram
-        code = node.assemble()
+        code = node.assemble(check_size=True)
         s.extend(node.asm_words(self.load_pump(len(code))))
         if code:
             s.extend(code)

@@ -298,9 +298,13 @@ class F18a:
         #     ret = last + ret[len(last):64]
         return ret
 
-    def assemble(self):
+    def assemble(self, check_size=False):
         # returns list of assembled RAM
-        return self.assemble_list(self.ram)
+        asm = self.assemble_list(self.ram)
+        if check_size and len(asm) > 64:
+            m = 'node {} code is too large: {} words'
+            throw_error(m.format(self.coord, len(asm)), False)
+        return asm
 
     def assemble_boot_code(self):
         return self.assemble_list(self.boot)
