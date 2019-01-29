@@ -256,7 +256,12 @@ class Parser:
 
     def expand_range(self, a, b):
         a, b = self.to_int(a), self.to_int(b)
-        inc = 1 if a//100 == b//100 else 100
+        if a//100 == b//100:
+            inc = 1
+        else:
+            inc = 100
+            if a%100 != b%100:
+                throw_error('invalid node range')
         coord, end = min(a,b), max(a,b)
         ret = [coord]
         while coord != end:
