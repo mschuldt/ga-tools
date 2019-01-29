@@ -287,6 +287,15 @@ def run_tests():
          {1: {'ram': [133554]},
           2: {'ram': [79017, 79017, 79017, 79017, 79017, 149938,
                       79017, 79017, 133554]}})
+
+    case('unext,',
+         '''node 1
+         unext, unext, dup dup
+         !b unext, unext, .
+         !b !b unext, unext,
+         ''',
+         None,
+         {1: {'ram': [119187, 37234, 39796]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
