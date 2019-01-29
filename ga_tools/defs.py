@@ -94,3 +94,6 @@ def throw_error(msg):
               '~column:', current_token.col)
         exit()
     raise Exception(msg)
+
+def valid_coord(coord):
+  return coord >= 0 and coord%100 < 18 and coord // 100 < 8
