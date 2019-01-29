@@ -184,6 +184,10 @@ def _tick(p):
         throw_error('tick: undefined word ' + name)
     node.push(word)
 
+@directive('coord')
+def _coord(_):
+    node.compile_constant(node.coord)
+
 def error_directive(msg):
     def fn(_):
         throw_error(msg)
