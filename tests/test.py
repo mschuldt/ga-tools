@@ -348,6 +348,17 @@ def run_tests():
          {1: {'ram': [18610, 3, 12805, 122882, 149938, 18610,
                       4, 45834, 122887, 84402]}})
          
+
+    case('include',
+         '''node 1 dup
+         include _test-include.ga
+         node 3 over
+         ''',
+         None,
+         {1: {'ram': [149938]},
+          5: {'ram': [21938, 1, 21938, 2, 73730, 18933, 1]},
+          6: {'ram': [21938, 1, 2, 84402, 73730, 18933, 1]},
+          3: {'ram': [133554]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))

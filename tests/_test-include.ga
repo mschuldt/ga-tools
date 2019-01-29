@@ -1,0 +1,17 @@
+
+\  This is for testing include functionality
+
+node 5
+ : one 1 ;
+ include _test-include2.ga
+ : three two 1 + ;
+
+node 6 ASM
+ : one
+  @p ;
+  1
+include _test-include2.ga
+ : three
+  call two
+  @p . + ;
+  1
