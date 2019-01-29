@@ -381,6 +381,15 @@ def run_tests():
           705: {'ram': [73945]},
           708: {'ram': [73931]}})
 
+    case('ports',
+         '''node 101
+         -d-u rdlu ;''',
+
+         '''node 101 ASM
+         call -d-u
+         jump rdlu''',
+         {101: {'ram': [73989, 65957]}})
+
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
