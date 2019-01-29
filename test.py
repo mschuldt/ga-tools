@@ -325,6 +325,19 @@ def run_tests():
           200: {'ram': [43442]},
           300: {'ram': [43442]},
           101: {'ram': [10674]}})
+
+    case('if:/-if:',
+         '''node 1
+         : label1
+         if: label1
+         -if: label2
+         @ -if: label2
+         : label2
+         : label3
+         dup
+         ''',
+         None,
+         {1: {'ram': [98304, 106499, 12803, 149938]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
