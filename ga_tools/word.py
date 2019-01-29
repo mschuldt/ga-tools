@@ -9,7 +9,7 @@ CONST = 1
 ADDR = 2
 
 class Word:
-    def __init__(self, prev=None):
+    def __init__(self, prev=None, addr=None):
         self._slots = [None, None, None, None]
         if prev:
             self.prev.next = self
@@ -27,7 +27,7 @@ class Word:
         self.addr_slot = None
         self.type = INST
         self.label = None
-        self.word_addr = None # address of this word in RAM
+        self.word_addr = addr # address of this word in RAM
         self.extended_arith = 0
 
     def empty(self):

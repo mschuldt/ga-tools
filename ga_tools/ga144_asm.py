@@ -60,9 +60,7 @@ class GA144:
         node.symbol_names = list(rom.keys())
         node.rom_names = list(node.symbol_names)
         for name, addr in rom.items():
-            w = Word()
-            w.word_addr = addr
-            node.symbols[name] = w
+            node.symbols[name] = Word(addr=addr)
 
     def json(self, bootstream_type=None):
         data = {coord:node.json() for coord, node in self.nodes.items()}
