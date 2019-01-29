@@ -74,6 +74,10 @@ chips = list(ga_tools.get_chips().values())
 if len(chips) > 1:
     #TODO: Support multiple chips
     raise Exception('Multiple chips are not supported yet')
+
+if not chips:
+    exit() # empty file
+
 chip = chips[0]
 
 if print_size:
