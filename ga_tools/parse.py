@@ -70,8 +70,6 @@ class Tokenizer:
         self.source = source
         self.current_line = 1
         self.current_column = 1
-        self.word_start_column = 0
-        self.current_line_start = 0
         self.text = None
         self.last_word = None
         self.unread_word = None
@@ -92,7 +90,6 @@ class Tokenizer:
         if is_newline(c):
             self.current_line += 1
             self.current_column = 1
-            self.current_line_start = self.index
         return c
 
     def peak(self):
@@ -125,7 +122,6 @@ class Tokenizer:
 
     def read_token(self):
         self.skip_space()
-        self.word_start_column = self.current_column
         word = []
         while True:
             if self.eof():
@@ -220,9 +216,6 @@ class Parser:
             return int(s, 0)
         except ValueError as e:
             throw_error(e)
-
-    def read_int(self):
-        return self.to_int(self.read_word())
 
     def read_name_token(self):
         while True:

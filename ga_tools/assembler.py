@@ -183,13 +183,13 @@ def _tick(p):
 
 def error_directive(msg):
     def fn(_):
-        raise_error('parser error')
+        throw_error(msg)
     return fn
 
 # These words should be handled by the parser
 for word in ('include', 'chip', 'node', 'asm',
-             '\n', '(', '\\'):
-    directives[word] = error_directive('parser error')
+             '\n', '(', '\\', 'wire'):
+    directives[word] = error_directive('parser error: ' + word)
 
 def set_baud(n):
     global baud
@@ -223,7 +223,7 @@ def process_call(reader, word):
     next_word = reader.peak()
     if next_word == ';':
         node.compile_call('jump', word)
-        reader.read_word()
+        reader.read_word() # discard ;
         return
     node.compile_call('call', word)
 
@@ -235,7 +235,6 @@ def process_aforth(coord, data):
             break
         fn = directives.get(w)
         if fn:
-
             fn(reader)
             continue
         n = parse_int(w)
@@ -254,10 +253,7 @@ def process_asm(coord, data):
 
 def process_chip(nodes):
     for coord, data in nodes.items():
-        if coord == 'global':
-            continue
         set_node(coord)
-        #node.symbols = data['labels']
         if data.asm:
             process_asm(coord, data)
         else:
@@ -271,7 +267,6 @@ def process_include(parser, top_level=True):
         process_chip(nodes)
 
 def include_file(filename, top_level=True):
-    '''digest FILENAME, which may have recursive includes'''
     p = Parser()
     p.include_file(filename)
     process_include(p, top_level)
