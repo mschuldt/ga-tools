@@ -26,8 +26,8 @@ parser.add_argument('--json',
                     help='Dump compiled data in json format')
 parser.add_argument('--print',
                     nargs=-1,
-                    help='Pretty print compiled node data')
-parser.add_argument('--listen',
+                    help='Pretty print assembled node data')
+parser.add_argument('--no-listen',
                     nargs=-1,
                     help='Wait for and print data from serial port')
 parser.add_argument('--size',
@@ -99,5 +99,5 @@ if args.port is None:
 
 chip.set_serial(args.port[0], args.baud[0])
 chip.write_bootstream(bootstream_type)
-if args.listen is not None:
+if args.no_listen is None:
     chip.serial.listen()
