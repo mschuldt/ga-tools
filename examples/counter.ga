@@ -1,0 +1,56 @@
+\ ga counter.ga --port /dev/ttyUSB0
+
+\ Uses a crystal to maintain time.
+\ Sends the debug values then counter value over serial once per second 
+
+\ The first values printed are port coordinates (debug values)
+\ Then the period delay values used for pumping the crystal are printed.
+\ Then the second counter is printed when it is incremented
+
+\ Requires a 32.768 khz watch crystal from 715.17 to gnd
+
+\ See 715crystal.ga for code comments
+
+node 715
+: -osc over !
+  io b! for
+  0x30000 !b dup .. 2/ dup for unext
+  0x20000 !b .. over 1 and .. + for unext next
+  dup or !b dup 30000 for
+  drop @b - -while next ;
+  then dup or pop drop ;
+: clang
+  12895 ( 12700) 2000 for dup 5000 -osc while
+  drop 1 . + next clang ; then
+: prep west a! ! 0 !
+   0 0x20000 0x800 0x30800 0 0x20000 0x800 0x30800
+   dup up a! drop
+: run !b !b @ drop run ;
+: main
+west a! 715 !
+clang ;
+
+node 710-714
+: loop @ !b loop ;
+: main east a! west b! coord !b loop ;
+
+node 709
+: monitor
+( print the test oscillation periods)
+@ dup !b
+if monitor then  ( 0 means oscillation found)
+io b! 0 ( seconds ) 0 ( clock edge) 
+: count ( counts seconds )
+ 0     !b up a! dup dup ! drop
+ 0x800 !b up a! dup dup ! drop
+ dup 32000 - 1 . + . +
+ -if drop 1 . + count ; then
+     drop over 1 . + dup west a! ! 0 count ;
+: main
+east a! west b! 709 !b 
+monitor ;
+
+node 708
+include 708serial.ga
+: main io b! east a!
+: loop @ send loop ;
