@@ -338,6 +338,16 @@ def run_tests():
          ''',
          None,
          {1: {'ram': [98304, 106499, 12803, 149938]}})
+
+    case('while/-while',
+         '''node 1
+         3 for @ -while next dup then
+         4 for ! while next ; then
+         ''',
+         None,
+         {1: {'ram': [18610, 3, 12805, 122882, 149938, 18610,
+                      4, 45834, 122887, 84402]}})
+         
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
