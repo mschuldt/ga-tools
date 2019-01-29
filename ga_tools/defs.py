@@ -79,19 +79,18 @@ def check_op(op):
     if op not in op_i:
         throw_error('invalid op: ' + str(op))
 
-file_stack = []
+current_token = None
 
-def push_file(p):
-    file_stack.append(p)
-
-def pop_file():
-    file_stack.pop(-1)
+def set_current_token(t):
+    global current_token
+    if t and t != '\n':
+        current_token = t
 
 def throw_error(msg):
-    if file_stack:
-        print('Compiler traceback (most recent position last):')
-        for p in file_stack:
-            p.print_location()
+    if current_token:
         print('Exception:', msg)
+        print('   Source:' , current_token.source,
+              'line:', current_token.line,
+              '~column:', current_token.col)
         exit()
     raise Exception(msg)

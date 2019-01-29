@@ -2,12 +2,12 @@
 from .defs import *
 
 class Token:
-    def __init__(self, value, line, col, filename):
+    def __init__(self, value, line, col, source):
         self.value = value
         self.line = line
         self.col = col
         #self.filename = intern(filename)
-        self.filename = filename
+        self.source = source
 
     def __repr__(self):
         s = 'NEWLINE' if self.value == '\n' else self.value
@@ -143,8 +143,8 @@ class Tokenizer:
         value = ''.join(word).lower() or None
         if value is None:
             return None
-        t = Token(value, self.current_column,
-                  self.current_line, self.source)
+        t = Token(value, self.current_line,
+                  self.current_column, self.source)
         self.last_word = t
         return t
 
@@ -205,6 +205,7 @@ class Parser:
         t = self.next_token
         if t:
             self.next_token = self.tokens.pop()
+        set_current_token(t)
         return t
 
     def eof(self):
@@ -360,29 +361,6 @@ class Parser:
         self.finish_node()
         return self.chips
 
-    def print_current_source_line(self):
-        i = self.current_line_start
-        s = []
-        while True:
-            if i > self.last:
-                break
-            c = self.text[i]
-            if is_newline(c):
-                break
-            s.append(c)
-            i += 1
-        print(''.join(s))
-
-    def print_location(self):
-        if not self.filename:
-            print('   String... position', self.index)
-        else:
-            print('   File "{}"'.format(self.filename),
-                  'line', self.current_line,
-                  'column', self.current_column)
-        print('      ',end='')
-        self.print_current_source_line()
-
 class TokenReader:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -399,6 +377,7 @@ class TokenReader:
         w = self.tokens[self.index]
         if not peak:
             self.index += 1
+            set_current_token(w)
         return w.value
 
 #    def next_int(self): #TODO: rename
