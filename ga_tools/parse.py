@@ -183,7 +183,7 @@ class Parser:
         tokenizer = Tokenizer(s, source)
         tokens = tokenizer.tokens()
         if self.next_token:
-            self.tokens.push(self.next_token)
+            self.tokens.append(self.next_token)
         else:
             tokens.append(None)
         tokens.reverse()
