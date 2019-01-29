@@ -35,7 +35,9 @@ for op in opcodes:
 def start_def(p):
     name = p.read_word()
     if name in directives:
-        throw_error("name '{}' is reserved".format(name))
+        throw_error("name '{}' is reserved {} (directive)".format(name))
+    elif name in node.rom_names:
+        throw_error("name '{}' already defined (rom)".format(name))
     node.start_def(name)
 
 @directive('if')
@@ -228,7 +230,8 @@ def set_node(coord):
 
 def process_call(reader, word):
     if word not in node.symbol_names:
-        throw_error("name '{}' is not defined".format(word))
+        m = "node {} - name '{}' is not defined"
+        throw_error(m.format(node.coord, word))
     next_word = reader.peak()
     if next_word == ';':
         node.compile_call('jump', word)
