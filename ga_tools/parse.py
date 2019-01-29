@@ -5,7 +5,7 @@ class Token:
     def __init__(self, value, line, col, source):
         self.value = value
         self.line = line
-        self.col = col
+        self.col = col - len(value)
         #self.filename = intern(filename)
         self.source = source
 
