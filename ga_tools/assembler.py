@@ -34,9 +34,8 @@ for op in opcodes:
 @directive(':')
 def start_def(p):
     name = p.read_word()
-# TODO: this check will not work if word is used before being defined
-#    if name in directives:
-#        throw_error("name '{}' is reserved".format(name))
+    if name in directives:
+        throw_error("name '{}' is reserved".format(name))
     node.start_def(name)
 
 @directive('if')
@@ -220,6 +219,8 @@ def set_node(coord):
     node.auto_nop_insert = auto_nop_insert
 
 def process_call(reader, word):
+    if word not in node.symbol_names:
+        throw_error("name '{}' is not defined".format(word))
     next_word = reader.peak()
     if next_word == ';':
         node.compile_call('jump', word)
@@ -254,6 +255,7 @@ def process_asm(coord, data):
 def process_chip(nodes):
     for coord, data in nodes.items():
         set_node(coord)
+        node.symbol_names = data.symbols
         if data.asm:
             process_asm(coord, data)
         else:
