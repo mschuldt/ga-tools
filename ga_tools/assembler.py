@@ -263,7 +263,7 @@ def process_asm(coord, data):
 def process_chip(nodes):
     for coord, data in nodes.items():
         set_node(coord)
-        node.symbol_names = data.symbols
+        node.symbol_names.extend(data.symbols)
         if data.asm:
             process_asm(coord, data)
         else:

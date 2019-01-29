@@ -8,6 +8,8 @@ from .defs import *
 from .ga_serial import *
 from .bootstream import *
 from .f18a_asm import *
+from .ga144_rom import get_node_rom
+from .word import Word
 
 class GA144:
     def __init__(self, name):
@@ -21,6 +23,7 @@ class GA144:
         n = self.nodes.get(coord)
         if not n:
             n = F18a(coord)
+            self.set_rom(n)
             self.nodes[coord] = n
         return n
 
@@ -51,6 +54,15 @@ class GA144:
                 node.resolve_transfers()
                 node.resolve_calls()
                 node.trim_last_word()
+
+    def set_rom(self, node):
+        rom = get_node_rom(node.coord)
+        node.symbol_names = list(rom.keys())
+        node.rom_names = list(node.symbol_names)
+        for name, addr in rom.items():
+            w = Word()
+            w.word_addr = addr
+            node.symbols[name] = w
 
     def json(self, bootstream_type=None):
         data = {coord:node.json() for coord, node in self.nodes.items()}

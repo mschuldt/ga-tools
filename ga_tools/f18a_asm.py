@@ -7,6 +7,7 @@ class F18a:
         #self.rom = None
         self.symbols = {} # maps names to Word objects
         self.symbol_names = None
+        self.rom_names = None
         self.boot = None # first boot word
         w = Word()
         self.ram = w # first instruction word
