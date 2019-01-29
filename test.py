@@ -306,6 +306,25 @@ def run_tests():
          {1: {'ram':[18866, 1]},
           2: {'ram': [18866, 2]},
           708: {'ram': [18866, 708]},})
+
+    case('multicoord',
+         '''node 1,2 dup
+         node 3,4,5-7 +
+         node 100-300 !
+         node 101-101 @
+         ''',
+         None,
+         {1: {'ram':[149938]},
+          2: {'ram': [149938]},
+          3: {'ram': [180658]},
+          4: {'ram': [180658]},
+          5: {'ram': [180658]},
+          6: {'ram': [180658]},
+          7: {'ram': [180658]},
+          100: {'ram': [43442]},
+          200: {'ram': [43442]},
+          300: {'ram': [43442]},
+          101: {'ram': [10674]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
