@@ -94,6 +94,10 @@ def _unext(_):
     node.compile_op('unext')
     node.pop()
 
+@directive('unext,')
+def _unext_comma(_):
+    node.compile_op('unext')
+
 @directive('end')
 def _end(_):
     node.compile_next('end')
