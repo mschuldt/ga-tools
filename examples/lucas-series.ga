@@ -7,9 +7,9 @@ include 708serial.ga
 
 : main
     io b! south a!
-    15 for @ out18 drop next
+    15 for @ send drop next
     exit
 
 node 608
-north a!  2 1 over ! dup !
+north a! 2 1 over ! dup !
 : lucas over over + dup ! lucas
