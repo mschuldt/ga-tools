@@ -378,17 +378,19 @@ class TokenReader:
     def peak(self):
         return self.read_word(True)
 
-    #    def next_word(self): #TODO: rename
-    def read_word(self, peak=False):
+    def read_token(self, peak=False):
         if self.index > self.last:
             return None
         w = self.tokens[self.index]
         if not peak:
             self.index += 1
             set_current_token(w)
-        return w.value
+        return w
 
-#    def next_int(self): #TODO: rename
+    def read_word(self, peak=False):
+        t = self.read_token(peak)
+        return t.value if t else None
+
     def read_int(self):
         w = self.read_word()
         try:
