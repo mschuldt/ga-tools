@@ -332,6 +332,8 @@ class Parser:
     def do_colon(self, t):
         name = self.read_name_token()
         node = self.current_node
+        if not node:
+            throw_error('node is unspecified')
         if name.value in node.symbols:
             throw_error("name '{}' already defined".format(name.value))
         node.symbols.append(name.value)
