@@ -25,6 +25,7 @@ class F18a:
         self.finished = False
         self.compile_0_as_dup_dup_or = True
         self.auto_nop_insert = True
+        self.const_refs = []
 
     def pop(self):
         if not self.stack:
@@ -128,7 +129,7 @@ class F18a:
     def compile_call(self, op, word):
         if self.current_slot == 3:
             self.fill_rest_with_nops()
-        self.current_word.set_call(op, word)
+        self.current_word.set_call(op, Ref(node=self, name=word))
         self.prev_op = op
         self.new_word()
 
@@ -221,7 +222,7 @@ class F18a:
         else:
             for op in ops:
                 if op in address_required:
-                    word.set_call(op, ops[-1])
+                    word.set_call(op, Ref(node=self, name=ops[-1]))
                     return word
                 else:
                     word.set_op(op)
@@ -245,7 +246,7 @@ class F18a:
         word = self.do_asm_word(ops, Word())
         word.extended_arith = self.extended_arith
         if word.type == ADDR:
-            word.resolve_symbol(self.symbols)
+            word.resolve_symbol()
         return word.asm()
 
     def asm_words(self, words, add_to_node=False):
@@ -267,6 +268,21 @@ class F18a:
                 addr |= w.extended_arith
             return addr
         return 0
+
+    def symbol_addr(self, name):
+        # return address of symbol NAME, or None if it's not known yet
+        w = self.symbols.get(name)
+        if w is None:
+            return None
+        return w.word_addr
+
+    def const_ref(self, name):
+        if type(name) == int:
+            ref = Ref(node=self, value=name)
+        else:
+            ref = Ref(node=self, name=name)
+        self.const_refs.append(ref)
+        return ref
 
     def set_word_addresses(self):
         # Set the address in ram of each word
@@ -315,7 +331,7 @@ class F18a:
         word = self.ram
         while word:
             if word.addr_sym:
-                word.resolve_symbol(self.symbols)
+                word.resolve_symbol()
             word = word.next
 
     def shift_addr_words(self):
@@ -333,8 +349,8 @@ class F18a:
         # Return True if the address WORD its in the available slots
         if word.type != ADDR:
             return True
-        sym = self.symbols.get(word.addr_sym)
-        dest_addr = sym.word_addr if sym else word.dest_word.word_addr
+        sym = word.addr_sym
+        dest_addr = sym.resolve() if sym else word.dest_word.word_addr
         mask = word_address_masks[word.op_index]
         _mask = ~mask & 0x3ffff
         p = word.word_addr + 1 if p is None else p

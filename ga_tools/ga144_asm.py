@@ -52,6 +52,8 @@ class GA144:
                 node.set_word_addresses()
                 node.shift_addr_words()
                 node.resolve_transfers()
+        for node in self.nodes.values():
+            if not node.asm_node:
                 node.resolve_calls()
                 node.trim_last_word()
 

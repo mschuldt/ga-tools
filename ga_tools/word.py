@@ -16,14 +16,14 @@ class Word:
         self.next = None
         self.prev = None
         self.symbol = None
-        self.const = None # set for number literals
+        self._const = None # Ref type set for number literals
         self.op_index = 0 # Index of next empty slot
         # If word type is ADDR, op_index will be left
         # pointing to the last op before the address
         self.dest_word = None # forward transfer destination word
         self._addr = None # set when word contains an address
         # set to True when addr is not yet determined
-        self.addr_sym = None
+        self.addr_sym = None # Ref
         self.addr_slot = None
         self.type = INST
         self.label = None
@@ -32,7 +32,7 @@ class Word:
 
     def empty(self):
         #return self.op_index == 0
-        return self.const is None and self._slots == [None, None, None, None]
+        return self._const is None and self._slots == [None, None, None, None]
 
     def fill_rest_with_nops(self):
         while self.op_index < 4:
@@ -52,9 +52,12 @@ class Word:
         self.dest_word = dest
         self.type = ADDR
 
-    def set_const(self, const):
-        self.const = const
+    def set_const(self, const, tok=None):
+        self._const = Ref(value=const, tok=tok)
         self.type = CONST
+
+    def get_const(self, required=True):
+        return self._const.resolve(required)
 
     def set_call(self, op, name):
         self.set_op(op, True)
@@ -79,15 +82,16 @@ class Word:
         from_word._addr = None
         from_word.addr_sym = None
 
-    def resolve_symbol(self, symbols):
+    def resolve_symbol(self):
         if type(self.addr_sym) == int:
             self.set_addr(self.addr_sym)
         else:
-            dest = symbols.get(self.addr_sym)
-            if not dest:
-                m = 'Call to undefined word: ->{}<-'.format(self.addr_sym)
-                raise Exception(m)
-            self.set_addr(dest.word_addr)
+            dest = self.addr_sym.resolve()
+            if dest is None:
+                m = 'Unresolved symbol: ->{}<-'.format(
+                    self.addr_sym.name)
+                throw_error(m)
+            self.set_addr(dest)
 
     def asm_op(self, slot, shift, xor_bits):
         op = self._slots[slot]
@@ -103,7 +107,7 @@ class Word:
             return 0x134a9 # call warm
         typ = self.type
         if typ == CONST:
-            w = self.const
+            w = self.get_const(True)
         elif typ == INST or typ == ADDR:
             f = self.asm_op
             w = f(3, 0, 5) | f(2, 3, 10) | f(1, 8, 21) | f(0, 13, 10)
@@ -136,11 +140,32 @@ class Word:
         if typ == INST:
             return self.inst_str()
         if typ == CONST:
-            return str(self.const)
+            return str(self._const)
         if typ == ADDR:
             return self.inst_str() + ' ' + hex(self._addr)[2:]
         return 'Error unhandled word type'
 
+class Ref:
+    def __init__(self, node=None, name=None, value=None, tok=None):
+        # a reference to the address of NAME in NODE
+        self.node = node
+        self.name = name
+        self.value = value
+        self.tok = tok
+    def resolve(self, required=True):
+        if self.value is not None:
+            return self.value
+        v = self.node.symbol_addr(self.name)
+        if required and v is None:
+            throw_error('unresolved reference: ' + self.name,
+                        token=self.tok)
+        self.value = v
+        return v
+    def __str__(self):
+        v = self.resolve()
+        if v is None:
+            return "Ref('{}')".format(self.name)
+        return str(v)
 
 def disasm_to_str(n):
     w = Word()
