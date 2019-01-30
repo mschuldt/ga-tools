@@ -26,6 +26,9 @@ class F18a:
         self.compile_0_as_dup_dup_or = True
         self.auto_nop_insert = True
         self.const_refs = []
+        self.init_a = None
+        self.init_b = None
+        self.init_p = None
 
     def pop(self):
         if not self.stack:
@@ -263,10 +266,14 @@ class F18a:
         # Returns the start address - address of 'main' or 0
         w = self.symbols.get('main')
         if w:
+            if self.init_p is not None:
+                throw_error("conflicting /p and 'main'")
             addr = w.word_addr
             if with_extended_arith:
                 addr |= w.extended_arith
             return addr
+        if self.init_p:
+            return self.init_p.resolve()
         return 0
 
     def symbol_addr(self, name):
@@ -383,14 +390,18 @@ class F18a:
 
     def print(self):
         # pretty print this node)
-        # TODO: -should call self.assemble since that wraps the words)
+        # TODO: -should call self.assemble since that wraps the words
         #       -handle the word wrapping better...
         print('\n'+'_'*53)
         print('      Compiled             Assembled     Disassembled')
         print('node ', self.coord, '  ASM' if self.asm_node else '')
-        w = self.symbols.get('main')
-        #print('P =', w.word_addr if w else 0)
-
+        p = self.start_addr()
+        if p:
+            print('/p', p)
+        if self.init_a is not None:
+            print('/a', self.init_a)
+        if self.init_b is not None:
+            print('/b', self.init_b)
         def print_list(ll):
             a = 0
             while ll:

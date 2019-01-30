@@ -190,6 +190,26 @@ def _tick(p):
 def _coord(_):
     node.compile_constant(node.coord)
 
+def read_addr(p):
+    # TODO: need to handle port directions and multiport addresses
+    w = p.read_word()
+    try:
+        return node.const_ref(int(w, 0))
+    except ValueError as _:
+        pass
+    return node.const_ref(w)
+
+@directive('/a')
+def _init_a(p):
+    node.init_a = read_addr(p)
+
+@directive('/b')
+def _init_b(p):
+        node.init_b = read_addr(p)
+
+@directive('/p')
+def _init_p(p):
+    node.init_p = read_addr(p)
 def error_directive(msg):
     def fn(_):
         throw_error(msg)
