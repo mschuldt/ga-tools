@@ -184,7 +184,7 @@ def _tick(p):
     word = node.symbols.get(name)
     if not word:
         throw_error('tick: undefined word ' + name)
-    node.push(word)
+    node.compile_constant(word)
 
 @directive('coord')
 def _coord(_):
