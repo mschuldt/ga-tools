@@ -1,4 +1,6 @@
 
+import os
+
 from .defs import *
 
 class Token:
@@ -192,7 +194,9 @@ class Parser:
 
     def include_file(self, filename=None):
         if not filename:
-            filename = self.read_name()
+            tok = self.read_name_token()
+            base = os.path.abspath(os.path.dirname(tok.source))
+            filename = os.path.join(base, tok.value)
         f = open(filename)
         self.include_string(f.read(), filename)
         f.close()
