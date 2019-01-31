@@ -405,6 +405,12 @@ class TokenReader:
         except ValueError as e:
             throw_error(e)
 
+    def read_coord(self):
+        n = self.read_int()
+        if not valid_coord(n):
+            throw_error('invalid node coordinate: ' + str(n))
+        return n
+
     def error(self, msg):
         pass
 
