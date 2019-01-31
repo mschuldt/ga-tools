@@ -43,19 +43,24 @@ class GA144:
         return node
 
     def compile_nodes(self):
-        for node in self.nodes.values():
+        nodes = self.nodes.values()
+        for node in nodes:
+            node.set_word_addresses()
+        aforth_nodes = []
+        for node in nodes:
             if node.asm_node:
-                node.set_word_addresses()
                 node.resolve_calls()
                 node.trim_last_word()
             else:
-                node.set_word_addresses()
                 node.shift_addr_words()
                 node.resolve_transfers()
-        for node in self.nodes.values():
-            if not node.asm_node:
-                node.resolve_calls()
-                node.trim_last_word()
+                aforth_nodes.append(node)
+        for node in aforth_nodes:
+            node.resolve_calls()
+            node.trim_last_word()
+        for node in aforth_nodes:
+            node.insert_streams()
+        self.delete_streams()
 
     def set_rom(self, node):
         rom = get_node_rom(node.coord)
@@ -64,6 +69,17 @@ class GA144:
         node.rom_names.extend(node.symbol_names)
         for name, addr in rom.items():
             node.symbols[name] = Word(addr=addr)
+
+    def new_stream(self, coord, into):
+        s = Stream(self.node(coord), into=into)
+        self.nodes[s.name] = s
+        return s
+
+    def delete_streams(self):
+        # delete stream nodes so they don't show up in assembly output
+        for coord, node in list(self.nodes.items()):
+            if node.stream:
+                del self.nodes[coord]
 
     def json(self, bootstream_type=None):
         data = {coord:node.json() for coord, node in self.nodes.items()}

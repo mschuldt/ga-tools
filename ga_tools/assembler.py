@@ -18,6 +18,8 @@ auto_nop_insert = True
 
 baud=None
 
+node_stack = []
+
 def directive(name):
     def decorator(fn):
         directives[name] = fn
@@ -210,6 +212,42 @@ def _init_b(p):
 @directive('/p')
 def _init_p(p):
     node.init_p = read_addr(p)
+def read_stream_options(r):
+    into, thru = None, None
+    while True:
+        val = r.peak()
+        if val == 'into':
+            r.read_word() #discard
+            into = r.read_coord()
+            continue
+        if val == 'thru':
+            r.read_word() #discard
+            thru = r.read_word()
+            if thru not in ['!', '!b', '!p']:
+                throw_error("invalid value for 'thru': " + thru)
+            continue
+        if into is None:
+            throw_error("'stream{' requires 'node' argument")
+        return into, thru
+
+@directive('stream{')
+def _start_stream(r):
+    global node
+    node_stack.append(node)
+    into, thru = read_stream_options(r)
+    stream = chip.new_stream(into, thru)
+    node.compile_stream(stream)
+    node = stream
+
+@directive('}stream')
+def _end_stream(r):
+    global node
+    assert node.stream
+    if not node_stack:
+        throw_error('unmatched }stream')
+    node.fill_rest_with_nops()
+    node = node_stack.pop()
+
 def error_directive(msg):
     def fn(_):
         throw_error(msg)
@@ -217,7 +255,7 @@ def error_directive(msg):
 
 # These words should be handled by the parser
 for word in ('include', 'chip', 'node', 'asm',
-             '\n', '(', '\\', 'wire'):
+             '\n', '(', '\\', 'wire', 'into', 'thru'):
     directives[word] = error_directive('parser error: ' + word)
 
 def set_baud(n):
@@ -249,7 +287,8 @@ def set_node(coord):
     node.auto_nop_insert = auto_nop_insert
 
 def process_call(reader, word):
-    if word not in node.symbol_names:
+    if word not in node.symbol_names and not node.stream:
+        #TODO: handle streams
         m = "node {} - name '{}' is not defined"
         throw_error(m.format(node.coord, word))
     next_word = reader.peak()

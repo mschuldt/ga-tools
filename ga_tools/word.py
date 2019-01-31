@@ -29,6 +29,7 @@ class Word:
         self.label = None
         self.word_addr = addr # address of this word in RAM
         self.extended_arith = 0
+        self.stream = False
 
     def empty(self):
         #return self.op_index == 0

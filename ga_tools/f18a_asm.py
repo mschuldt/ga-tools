@@ -29,6 +29,7 @@ class F18a:
         self.init_a = None
         self.init_b = None
         self.init_p = None
+        self.stream = False
 
     def pop(self):
         if not self.stack:
@@ -49,7 +50,10 @@ class F18a:
         count = 0
         last = None
         while word:
-            count += 1
+            if word.stream:
+                count += word.stream.count_ram()
+            else:
+                count += 1
             last = word
             word = word.next
         if last and last.empty():
@@ -178,6 +182,11 @@ class F18a:
 
     def compile_port(self, port):
         self.compile_constant(self.port_addrs[port])
+
+    def compile_stream(self, stream):
+        self.fill_rest_with_nops()
+        self.current_word.stream = stream
+        self.new_word()
 
     def port_addr(self, port, opposite=False):
         if opposite:
@@ -379,6 +388,35 @@ class F18a:
         if new.next is None:
             self.last_word = new
 
+    def insert_streams(self):
+        word = self.ram
+        while word:
+            if word.stream:
+                self.insert_stream(word, word.stream)
+            word = word.next
+
+    def insert_stream(self, word, stream):
+        # replace WORD with the words in STREAM
+        first = self.get_stream_ram(stream)
+        if word.prev:
+            word.prev.next = first
+            first.prev = word.prev
+        else:
+            self.asm = first
+        last = stream.last_word
+        stream.trim_last_word
+        if word.next:
+            word.next.prev = last
+            last.next = word.next
+        else:
+            self.last_word = last
+
+    def get_stream_ram(self, stream):
+        ram = stream.ram
+        if stream.into:
+            pass #TODO
+        return ram
+
     def move_forward(self, n):
         if not self.current_word.empty():
             self.fill_rest_with_nops()
@@ -433,3 +471,32 @@ class F18a:
         data['symbols'] = {n:w.word_addr
                            for n,w in self.symbols.items()}
         return data
+
+class Stream(F18a):
+    counter = 0
+    def __init__(self, node, address=0x195, into=None):
+        super(Stream, self).__init__(node.coord)
+        self.node = node
+        self.address = address
+        self.into = into # store instruction: ! !b !p
+        self.symbol_names = node.symbol_names
+        self.symbols = node.symbols
+        self.rom_names = node.rom_names
+        self.stream = True
+        self.name = 'Stream_{}_{}'.format(self.coord, Stream.counter)
+        Stream.counter += 1
+
+    def set_word_addresses(self):
+        a = self.address
+        word = self.ram
+        while word:
+            word.word_addr = a
+            word = word.next
+
+    def count_ram(self):
+        count = super(Stream, self).count_ram()
+        if self.into:
+            # reserve space for stream logic
+            count += 3
+        return count
+
