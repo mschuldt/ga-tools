@@ -388,8 +388,23 @@ class F18a:
         for _ in range(n - length):
             self.new_word()
 
+    def print_list(self, ll, names={}):
+        a = 0
+        while ll:
+            s = names.get(a)
+            if s:
+                print(':', s)
+            asm = ll.asm()
+            disasm = disasm_to_str(asm)
+            addr = hex(a)[2:].ljust(5)
+            comp = str(ll).ljust(20)
+            asm = str(asm).ljust(13)
+            print(addr, comp, asm, disasm)
+            ll = ll.next
+            a += 1
+
     def print(self):
-        # pretty print this node)
+        # pretty print this node
         # TODO: -should call self.assemble since that wraps the words
         #       -handle the word wrapping better...
         print('\n'+'_'*53)
@@ -402,27 +417,12 @@ class F18a:
             print('/a', self.init_a)
         if self.init_b is not None:
             print('/b', self.init_b)
-        def print_list(ll):
-            a = 0
-            while ll:
-                s = addrs.get(a)
-                if s:
-                    print(':', s)
-                asm = ll.asm()
-                disasm = disasm_to_str(asm)
-                addr = hex(a)[2:].ljust(5)
-                comp = str(ll).ljust(20)
-                asm = str(asm).ljust(13)
-                print(addr, comp, asm, disasm)
-                ll = ll.next
-                a += 1
-        addrs = {}
         if self.boot:
             print(': boot')
             print_list(self.boot)
             print('- '*27)
-        addrs = {w.word_addr:s for s,w in self.symbols.items()}
-        print_list(self.ram)
+        names = {w.word_addr:s for s,w in self.symbols.items()}
+        self.print_list(self.ram, names)
 
     def json(self):
         data = {'ram': self.assemble()}
