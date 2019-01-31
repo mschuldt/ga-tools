@@ -60,8 +60,8 @@ class GA144:
     def set_rom(self, node):
         rom = get_node_rom(node.coord)
         rom.update(io_places)
-        node.symbol_names = list(rom.keys())
-        node.rom_names = list(node.symbol_names)
+        node.symbol_names.extend(list(rom.keys()))
+        node.rom_names.extend(node.symbol_names)
         for name, addr in rom.items():
             node.symbols[name] = Word(addr=addr)
 

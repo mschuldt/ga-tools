@@ -6,8 +6,8 @@ class F18a:
     def __init__(self, coord):
         #self.rom = None
         self.symbols = {} # maps names to Word objects
-        self.symbol_names = None
-        self.rom_names = None
+        self.symbol_names = []
+        self.rom_names = []
         self.boot = None # first boot word
         w = Word()
         self.ram = w # first instruction word
