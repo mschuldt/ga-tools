@@ -159,7 +159,8 @@ class Ref:
         if required and v is None:
             throw_error('unresolved reference: ' + self.name,
                         token=self.tok)
-        self.value = v
+        # Don't cache value, it can change as words shift
+        # self.value = v
         return v
     def __str__(self):
         v = self.resolve()
