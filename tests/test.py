@@ -443,9 +443,10 @@ def case(name, aforth, asm, expect):
     global tests_run
     ga_tools.reset()
     if aforth:
-            ga_tools.include_string('chip test_aforth\n' + aforth)
+            ga_tools.include_string('chip test_aforth\n'
+                                    + aforth, __file__)
     if asm:
-        ga_tools.include_string('chip test_asm\n' + asm)
+        ga_tools.include_string('chip test_asm\n' + asm, __file__)
     ga_tools.do_compile()
     chips = ga_tools.get_chips()
     ok = True

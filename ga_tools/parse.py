@@ -193,10 +193,13 @@ class Parser:
         self.tokens.extend(tokens)
 
     def include_file(self, filename=None):
-        if not filename:
+        if filename is None:
             tok = self.read_name_token()
-            base = os.path.abspath(os.path.dirname(tok.source))
-            filename = os.path.join(base, tok.value)
+            if tok.source:
+                base = os.path.abspath(os.path.dirname(tok.source))
+                filename = os.path.join(base, tok.value)
+            else:
+                filename = tok.value
         f = open(filename)
         self.include_string(f.read(), filename)
         f.close()

@@ -304,9 +304,9 @@ def include_file(filename, top_level=True):
     p.include_file(filename)
     process_include(p, top_level)
 
-def include_string(string):
+def include_string(string, source_file=None):
     p = Parser()
-    p.include_string(string)
+    p.include_string(string, source_file)
     process_include(p, True)
 
 def do_compile():
