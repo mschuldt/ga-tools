@@ -213,9 +213,11 @@ class F18a:
     def trim_last_word(self):
         if self.last_word.empty():
             if self.last_word.prev:
-                self.last_word.prev.next = None
+                self.last_word = self.last_word.prev
+                self.last_word.next = None
             else:
                 self.ram = None
+                self.last_word = None
         self.finished = True
 
     def do_asm_word(self, ops, word):
