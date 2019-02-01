@@ -236,6 +236,27 @@ def _end_stream(r):
     node.fill_rest_with_nops()
     node = node_stack.pop()
 
+# { and } are implemented as a stream that have a limit
+# to a single word and the current node as the destination node.
+
+@directive('{')
+def _start_asm(r):
+    global node
+    node_stack.append(node)
+    stream = chip.new_stream(node.coord, None)
+    stream.single_word = True
+    node.start_stream1(stream)
+    node = stream
+
+@directive('}')
+def _end_asm(r):
+    global node
+    assert node.stream
+    if not node_stack:
+        throw_error('unmatched }')
+    node.fill_rest_with_nops()
+    node = node_stack.pop()
+
 def error_directive(msg):
     def fn(_):
         throw_error(msg)

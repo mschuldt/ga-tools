@@ -101,10 +101,12 @@ class F18a:
     def set_next_const(self, const):
         if self.current_slot == 0:
             self.current_word.set_const(const)
+            w = self.current_word
             self.new_word()
-        else:
-            w = self.new_word(set_current=False)
-            w.set_const(const)
+            return w
+        w = self.new_word(set_current=False)
+        w.set_const(const)
+        return w
 
     def maybe_insert_nop(self, op):
         if not self.auto_nop_insert:
@@ -187,6 +189,11 @@ class F18a:
         self.fill_rest_with_nops()
         self.current_word.stream = stream
         self.new_word()
+
+    def start_stream1(self, stream):
+        self.compile_op(READ_P)
+        w = self.set_next_const(12345)
+        w.stream = stream
 
     def port_addr(self, port, opposite=False):
         if opposite:
@@ -389,6 +396,8 @@ class F18a:
 
     def insert_stream(self, word, stream):
         # replace WORD with the words in STREAM
+        if stream.single_word:
+            return self.insert_stream1(word, stream)
         first = self.get_stream_ram(stream)
         if word.prev:
             word.prev.next = first
@@ -402,6 +411,17 @@ class F18a:
             last.next = word.next
         else:
             self.last_word = last
+
+    def insert_stream1(self, word, stream):
+        asm = stream.assemble()
+        if len(asm) > 1:
+            for i, word in enumerate(asm):
+                print(i, word, disasm_to_str(word))
+            fmt = '{{...}} is too long (4 ops max): {}'
+            throw_error(fmt.format(asm))
+        elif len(asm) == 0:
+            throw_error('empty {...}')
+        word.set_const(asm[0])
 
     def get_stream_ram(self, stream):
         ram = stream.ram
@@ -475,6 +495,7 @@ class Stream(F18a):
         self.symbols = node.symbols
         self.rom_names = node.rom_names
         self.stream = True
+        self.single_word = True
         self.name = 'Stream_{}_{}'.format(self.coord, Stream.counter)
         Stream.counter += 1
 
