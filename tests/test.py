@@ -438,7 +438,15 @@ def cmp_json(asm_type, name, node, expect):
                 return False
     return True
 
-def case(name, aforth, asm, expect):
+def cmp_values(value, expect, test):
+    if value != expect:
+        fmt = 'Error: "{}" - value mismatch: {} != {}'
+        print(fmt.format(test, value, expect))
+        return False
+    return True
+
+
+def case(name, aforth, asm, expect, fn=lambda chip: True):
     print('TEST', name)
     global tests_run
     ga_tools.reset()
@@ -451,9 +459,13 @@ def case(name, aforth, asm, expect):
     chips = ga_tools.get_chips()
     ok = True
     if aforth:
-        ok = cmp_json('Aforth', name, chips.get('test_aforth'), expect)
+        chip = chips.get('test_aforth')
+        ok = cmp_json('Aforth', name, chip, expect)
+        ok = ok and fn(chip)
     if asm:
+        chip = chips.get('test_aforth')
         ok = cmp_json('ASM', name, chips.get('test_asm'), expect) and ok
+        ok = ok and fn(chip)
     tests_run += 1
     if not ok:
         failed_tests.append(name)
