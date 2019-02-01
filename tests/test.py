@@ -406,6 +406,14 @@ def run_tests():
          None,
          {1: {'ram': [149938, 149938, 84402]}},
          check_boot_desc)
+
+    case(',name',
+         '''node 1
+         , 0b101 , io , -d-u , testname
+         : testname , 3 ;
+         ''',
+         None,
+         {1: {'ram': [5, 349, 261, 4, 3, 84402]}})
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
