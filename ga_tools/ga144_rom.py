@@ -1,6 +1,15 @@
 
+from .defs import named_addresses, io_places
+
+
+extra_names = dict(named_addresses)
+extra_names.update(io_places)
+
 def get_node_rom(coord):
-    return node_rom_type.get(coord, basic_rom)
+    rom = node_rom_type.get(coord, basic_rom)
+    rom.update(extra_names)
+    return rom
+
 
 # block 1418  math rom anywhere
 
