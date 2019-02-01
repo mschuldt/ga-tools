@@ -467,10 +467,12 @@ class F18a:
             ll = ll.next
             a += 1
 
-    def print(self):
+    def print(self, simple=False):
         # pretty print this node
         # TODO: -should call self.assemble since that wraps the words
         #       -handle the word wrapping better...
+        if simple:
+            return self.simple_print()
         print('\n'+'_'*53)
         print('      Compiled             Assembled     Disassembled')
         print('node ', self.coord, '  ASM' if self.asm_node else '')
@@ -487,6 +489,13 @@ class F18a:
             print('- '*27)
         names = {w.word_addr:s for s,w in self.symbols.items()}
         self.print_list(self.ram, names)
+
+    def simple_print(self):
+        print('node', self.coord)
+        word = self.ram
+        while word:
+            print(word.asm())
+            word = word.next
 
     def json(self):
         data = {'ram': self.assemble()}

@@ -39,6 +39,9 @@ parser.add_argument('--disable-0-opt',
 parser.add_argument('--disable-plus-opt',
                     nargs=-1,
                     help="Don't auto insert nops before + or +*")
+parser.add_argument('--print-simple',
+                    nargs=-1,
+                    help='Simple assembly output usefull for diffs')
 parser.add_argument('--version',
                     nargs=-1,
                     help='GA-tools version')
@@ -55,7 +58,7 @@ else:
     bootstream_type = args.bootstream[0]
 
 print_json = args.json is not None
-print_pretty = args.print is not None
+print_pretty = args.print is not None or args.print_simple is not None
 print_size = args.size is not None
 
 ga_tools.optimize_0(args.disable_0_opt is None)
@@ -85,7 +88,7 @@ if print_size:
     exit()
 
 if print_pretty:
-    ga_tools.print_nodes()
+    ga_tools.print_nodes(args.print_simple is not None)
     exit()
 
 if print_json:
