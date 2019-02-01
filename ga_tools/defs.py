@@ -43,8 +43,7 @@ named_addresses = { 'right': 0x1D5,
                     'side': 0x185,
                     'corner': 0x195 }
 
-port_names = ('north', 'east', 'south', 'west',
-              'up', 'right', 'down', 'left')
+port_names = ('north', 'east', 'south', 'west')
 
 word_address_masks = (0x3ff, 0xff, 0x7)
 

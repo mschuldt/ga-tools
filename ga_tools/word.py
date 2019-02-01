@@ -157,6 +157,7 @@ class Ref:
         self.name = name
         self.value = value
         self.tok = tok
+
     def resolve(self, required=True):
         if self.value is not None:
             return self.value
