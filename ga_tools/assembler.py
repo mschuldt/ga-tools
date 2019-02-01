@@ -224,7 +224,7 @@ def _start_stream(r):
     node_stack.append(node)
     into, thru = read_stream_options(r)
     stream = chip.new_stream(into, thru)
-    node.compile_stream(stream)
+    node.start_stream(stream)
     node = stream
 
 @directive('}stream')

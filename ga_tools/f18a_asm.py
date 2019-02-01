@@ -30,6 +30,7 @@ class F18a:
         self.init_b = None
         self.init_p = None
         self.stream = False
+        self.name = None
 
     def pop(self):
         if not self.stack:
@@ -185,7 +186,7 @@ class F18a:
     def compile_port(self, port):
         self.compile_constant(self.port_addrs[port])
 
-    def compile_stream(self, stream):
+    def start_stream(self, stream):
         self.fill_rest_with_nops()
         self.current_word.stream = stream
         self.new_word()
