@@ -9,42 +9,38 @@ node 507
 node 406
 /p north
 
-
 node 506
 /b north /p north
 
-: addr \ ( -- o )
+: addr  ( -- o )
  \ fetch byte address 0-383
  \ set A to bank
  \ o to offset 0-63
    dup 2/ 2/ 2/ 2/ 2/ 2/
    .. tab
-    , 0x175 \ west
-    , 0x115 \ south
-    , 0x1D5 \ east
+    , west
+    , south
+    , east
 
 : tab
-    pop . + a! @ a! 63 and ;
+    pop + a! @ a! 63 and ;
 : read
-     @b addr
-..    @p ! !
-..      @p a! @ !p
-..    @ !b ;
+    @b addr
+    { @p a! @ !p } ! !
+    @ !b ;
 
 : write
     @b addr
-..    @p ! ! @p
-..      @p a! . .
-..      @p ! . .
-    ! @b ! ;
+    { @p a! } ! !
+    { @p ! } ! @b ! ;
 
 : read_byte
   @b dup dup addr
-..  @p ! !
-..    @p a! @ !p
-..  2/ 2* or                \ low bit of addr
-    2* 2* 2*                \ 0 or 8
-   push @ hibyte
+  { @p a! @ !p } ! !
+  2/ 2* or                \ low bit of addr
+  2* 2* 2*                \ 0 or 8
+  push @ hibyte
+
 : lo8
    255 and !b ;
 
@@ -52,39 +48,31 @@ node 506
   begin 2/ unext lo8 ;
 
 : write_byte
-    @b dup
-    addr
-..  @p ! !
-..    @p a! . .
-..  ! @b ! ;
+    @b dup addr
+    { @p a! } ! !
+    ! @b ! ;
 
 : erase
-    @b push @b
-begin
+  @b push @b
+  begin
     dup addr
-..    @p ! ! @p
-..      @p a! dup
-..      or !
-..    ! 1 . +
-    next ;
+    { @p a! dup } ! !
+    { or ! } !
+    1 . +
+  next ;
 
-node 606 ( test node )
+
+node 606 \ test node
 /a south
 : write ( v a - )
-..   @p !
-..     write@506
-! ! ;
+   { write@506 } ! ! ! ;
 
 : read ( a - v )
-..   @p !
-..     read@506
-! @ ;
+  { read@506 } ! ! @ ;
 
 : erase ( a n - )
-( . !!break )
-..   @p !
-..     erase@506
-! ! ;
+\ . !!break
+  { erase@506 } ! ! ! ;
 
 : main
 \   111 0 write
@@ -96,7 +84,7 @@ node 606 ( test node )
 60 20 erase
 
 10 read
-   ( . !!printT )
+    ( . !!printT )
 
 
 warm ;
