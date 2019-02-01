@@ -19,6 +19,7 @@ class F18a:
         self.boot_code = False
         self.coord = coord
         self.port_addrs = node_ports(coord)
+        self.node_port_names = node_port_names(coord)
         self.extended_arith = 0
         self.asm_node = False
         self.next_asm_symbol = None

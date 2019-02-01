@@ -8,6 +8,8 @@ from .defs import *
 from .ga144_asm import *
 from .parse import *
 
+import re
+
 chip = None
 node = None
 
@@ -177,14 +179,17 @@ def _org(p):
     node.move_forward(p.read_int())
 
 def read_ref(p):
-     w = p.read_word()
-     try:
-         return Ref(node=node, value=int(w, 0))
-     except ValueError as e:
-         if w in port_names:
-             addr = node.port_addrs[port_names.index(w)]
-             return Ref(node=node, value=addr)
-         return Ref(node=node, name=w)
+    w = p.read_word()
+    try:
+        return Ref(node=node, value=int(w, 0))
+    except ValueError as e:
+        pass
+    m = re.search('([^ ]+)@([0-9]+)', w)
+    word = m.group(1) if m else w
+    location = chip.node(int(m.group(2))) if m else node
+    if word in port_names:
+        word = node.node_port_names[port_names.index(w)]
+    return Ref(node=location, name=word)
 
 @directive(',')
 def _comma(p):
