@@ -2,6 +2,7 @@
 import os
 
 from .defs import *
+from .word import Ref
 
 class Token:
     def __init__(self, value, line, col, source):
@@ -31,8 +32,8 @@ class Node:
         node.symbols = self.symbols
         return node
 
-    def token_reader(self):
-        return TokenReader(self.tokens)
+    def token_reader(self, node):
+        return TokenReader(node, self.tokens)
 
     def finish(self):
         pass
@@ -377,10 +378,11 @@ class Parser:
         return self.chips
 
 class TokenReader:
-    def __init__(self, tokens):
+    def __init__(self, node, tokens):
         self.tokens = tokens
         self.index = 0
         self.last = len(tokens) -1
+        self.node = node
 
     def peak(self):
         return self.read_word(True)
@@ -404,6 +406,13 @@ class TokenReader:
             return int(w, 0)
         except ValueError as e:
             throw_error(e)
+
+    def read_ref(self):
+        w = self.read_word()
+        try:
+            return Ref(node=self.node, value=int(w, 0))
+        except ValueError as e:
+            return Ref(node=self.node, name=w)
 
     def read_coord(self):
         n = self.read_int()

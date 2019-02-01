@@ -54,7 +54,10 @@ class Word:
         self.type = ADDR
 
     def set_const(self, const, tok=None):
-        self._const = Ref(value=const, tok=tok)
+        if type(const) == Ref:
+            self._const = const
+        else:
+            self._const = Ref(value=const, tok=tok)
         self.type = CONST
 
     def get_const(self, required=True):

@@ -178,7 +178,7 @@ def _org(p):
 
 @directive(',')
 def _comma(p):
-    node.set_next_const(p.read_int())
+    node.set_next_const(p.read_ref())
 
 @directive("'")
 def _tick(p):
@@ -192,26 +192,18 @@ def _tick(p):
 def _coord(_):
     node.compile_constant(node.coord)
 
-def read_addr(p):
-    # TODO: need to handle port directions and multiport addresses
-    w = p.read_word()
-    try:
-        return node.const_ref(int(w, 0))
-    except ValueError as _:
-        pass
-    return node.const_ref(w)
-
 @directive('/a')
 def _init_a(p):
-    node.init_a = read_addr(p)
+    node.init_a = p.read_ref()
 
 @directive('/b')
 def _init_b(p):
-        node.init_b = read_addr(p)
+    node.init_b = p.read_ref()
 
 @directive('/p')
 def _init_p(p):
-    node.init_p = read_addr(p)
+    node.init_p = p.read_ref()
+
 def read_stream_options(r):
     into, thru = None, None
     while True:
@@ -299,7 +291,7 @@ def process_call(reader, word):
     node.compile_call('call', word)
 
 def process_aforth(coord, data):
-    reader = data.token_reader()
+    reader = data.token_reader(node)
     while True:
         w = reader.read_word()
         if not w:

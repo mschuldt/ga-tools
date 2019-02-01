@@ -294,14 +294,6 @@ class F18a:
             return None
         return w.word_addr
 
-    def const_ref(self, name):
-        if type(name) == int:
-            ref = Ref(node=self, value=name)
-        else:
-            ref = Ref(node=self, name=name)
-        self.const_refs.append(ref)
-        return ref
-
     def set_word_addresses(self):
         # Set the address in ram of each word
         a = 0
