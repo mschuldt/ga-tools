@@ -176,13 +176,23 @@ def _disable_plus_opt(_):
 def _org(p):
     node.move_forward(p.read_int())
 
+def read_ref(p):
+     w = p.read_word()
+     try:
+         return Ref(node=node, value=int(w, 0))
+     except ValueError as e:
+         if w in port_names:
+             addr = node.port_addrs[port_names.index(w)]
+             return Ref(node=node, value=addr)
+         return Ref(node=node, name=w)
+
 @directive(',')
 def _comma(p):
-    node.set_next_const(p.read_ref())
+    node.set_next_const(read_ref(p))
 
 @directive("'")
 def _tick(p):
-    node.compile_constant(p.read_ref())
+    node.compile_constant(read_ref(p))
 
 @directive('coord')
 def _coord(_):
@@ -190,15 +200,15 @@ def _coord(_):
 
 @directive('/a')
 def _init_a(p):
-    node.init_a = p.read_ref()
+    node.init_a = read_ref(p)
 
 @directive('/b')
 def _init_b(p):
-    node.init_b = p.read_ref()
+    node.init_b = read_ref(p)
 
 @directive('/p')
 def _init_p(p):
-    node.init_p = p.read_ref()
+    node.init_p = read_ref(p)
 
 def read_stream_options(r):
     into, thru = None, None
