@@ -412,6 +412,9 @@ class TokenReader:
         try:
             return Ref(node=self.node, value=int(w, 0))
         except ValueError as e:
+            if w in port_names:
+                addr = self.node.port_addrs[port_names.index(w)]
+                return Ref(node=self.node, value=addr)
             return Ref(node=self.node, name=w)
 
     def read_coord(self):
