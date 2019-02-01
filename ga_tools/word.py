@@ -1,6 +1,7 @@
 
 from .defs import *
 
+addr_masks = (0x3ff, 0xff, 0x7)
 xor_bits = (0b1010, 0b10101, 0b1010, 0b101)
 xor_bits2 = (0b1010, 0b10101, 0b1010, 0b10100)
 
@@ -112,16 +113,17 @@ class Word:
             return 0x134a9 # call warm
         typ = self.type
         if typ == CONST:
-            w = self.get_const(True)
+            w = self.get_const(True) & 0x3ffff
         elif typ == INST or typ == ADDR:
             f = self.asm_op
             w = f(3, 0, 5) | f(2, 3, 10) | f(1, 8, 21) | f(0, 13, 10)
             if typ == ADDR:
-                w |= self._addr
+                w |= self._addr & addr_masks[self.op_index]
         return w
 
     def disasm(self, w):
         # disassemble W into this object
+        # TODO: to properly disassemble addresses need to know P
         addr_shift = 0
         for x in xor_bits2:
             op = ((w & 0x3e000) >> 13) ^ x
