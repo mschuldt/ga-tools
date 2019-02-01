@@ -423,6 +423,18 @@ def run_tests():
          None,
          {1: {'ram': [23831, 5, 349, 261, 5, 153010]}})
 
+    case("port-references",
+         '''node 0 , north , east , south , west \ D R U L
+         node 100  , north , east , south , west \ U R D L
+         node 1    , north , east , south , west \ D L U R
+         node 101  , north , east , south , west \ U L D R
+         ''',
+         None,
+         {0: {'ram': [0x115, 0x1D5, 0x145, 0x175]},
+          100: {'ram': [0x145, 0x1D5, 0x115, 0x175]},
+          1: {'ram': [0x115, 0x175, 0x145, 0x1D5]},
+          101: {'ram': [0x145, 0x175, 0x115,0x1D5]}})
+
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
