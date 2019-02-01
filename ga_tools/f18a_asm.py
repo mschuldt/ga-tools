@@ -377,15 +377,25 @@ class F18a:
         max_dest = (_mask & p) | (mask & dest_addr)
         return (dest_addr >= min_dest) & (dest_addr <= max_dest)
 
+    def find_shift_dest(self, word):
+        ret = word
+        for i in range(4):
+            if word._slots[i] == OP_READ_P:
+                ret = ret.next
+        return ret
+
     def shift_addr_word(self, word):
         # Creates a new word following WORD and moves the
         # transfer to the new word.
+        # If instruction has @p instructions, insert the instruction
+        # after the last word they read.
         new = Word()
         new.move_addr(word)
-        word.next.prev = new
-        new.prev = word
-        new.next = word.next
-        word.next = new
+        after = self.find_shift_dest(word)
+        after.next.prev = new
+        new.prev = after
+        new.next = after.next
+        after.next = new
         if new.next is None:
             self.last_word = new
 

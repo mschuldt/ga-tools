@@ -15,7 +15,8 @@ def get_op_i(op):
     x = op_i.get(op)
     return x
 
-OP_NOP = get_op_i('.')
+OP_NOP = get_op_i(NOP)
+OP_READ_P = get_op_i(READ_P)
 
 opcodes = frozenset(ops)
 
