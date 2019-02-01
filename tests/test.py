@@ -390,6 +390,22 @@ def run_tests():
          jump rdlu''',
          {101: {'ram': [73989, 65957]}})
 
+    def check_boot_desc(chip):
+        node = chip.node(1)
+        ok = cmp_values(node.init_p.resolve(), 0x115, "/p")
+        ok = ok and cmp_values(node.init_a.resolve(), 0x15d, "/a")
+        ok = ok and cmp_values(node.init_b.resolve(), 2, "/b")
+        return ok
+
+    case('boot-descriptors',
+         '''node 1
+         /p -d-- /a io /b testword
+         dup .. dup
+         : testword ;
+         ''',
+         None,
+         {1: {'ram': [149938, 149938, 84402]}},
+         check_boot_desc)
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
