@@ -54,11 +54,11 @@ def _if(_):
 
 @directive('if:')
 def _if_label(p):
-    node.compile_call('if', p.read_word())
+    node.compile_call('if', make_ref(p.read_word()))
 
 @directive('-if:')
 def __if_label(p):
-    node.compile_call('-if', p.read_word())
+    node.compile_call('-if', make_ref(p.read_word()))
 
 @directive('then')
 def _if(_):
@@ -178,8 +178,7 @@ def _disable_plus_opt(_):
 def _org(p):
     node.move_forward(p.read_int())
 
-def read_ref(p):
-    w = p.read_word()
+def make_ref(w):
     try:
         return Ref(node=node, value=int(w, 0))
     except ValueError as e:
@@ -190,6 +189,9 @@ def read_ref(p):
     if word in port_names:
         word = node.node_port_names[port_names.index(w)]
     return Ref(node=location, name=word)
+
+def read_ref(p):
+    return make_ref(p.read_word())
 
 @directive(',')
 def _comma(p):
@@ -311,16 +313,18 @@ def set_node(coord):
     node.auto_nop_insert = auto_nop_insert
 
 def process_call(reader, word):
-    if word not in node.symbol_names and not node.stream:
-        #TODO: handle streams
-        m = "node {} - name '{}' is not defined"
-        throw_error(m.format(node.coord, word))
+    ref = make_ref(word)
+    if ref.node == node:
+        if word not in node.symbol_names and not node.stream:
+            #TODO: handle streams
+            m = "node {} - name '{}' is not defined"
+            throw_error(m.format(node.coord, word))
     next_word = reader.peak()
     if next_word == ';':
-        node.compile_call('jump', word)
+        node.compile_call('jump', ref)
         reader.read_word() # discard ;
         return
-    node.compile_call('call', word)
+    node.compile_call('call', ref)
 
 def process_aforth(coord, data):
     reader = data.token_reader(node)

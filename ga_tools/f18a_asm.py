@@ -137,10 +137,10 @@ class F18a:
             self.compile_op(READ_P)
             self.set_next_const(const)
 
-    def compile_call(self, op, word):
+    def compile_call(self, op, ref):
         if self.current_slot == 3:
             self.fill_rest_with_nops()
-        self.current_word.set_call(op, Ref(node=self, name=word))
+        self.current_word.set_call(op, ref)
         self.prev_op = op
         self.new_word()
 

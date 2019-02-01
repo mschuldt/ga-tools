@@ -64,6 +64,7 @@ class Word:
         return self._const.resolve(required)
 
     def set_call(self, op, name):
+        assert type(name) == Ref
         self.set_op(op, True)
         self.addr_sym = name
         self.type = ADDR
