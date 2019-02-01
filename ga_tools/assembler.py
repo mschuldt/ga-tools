@@ -182,11 +182,7 @@ def _comma(p):
 
 @directive("'")
 def _tick(p):
-    name = p.read_word()
-    word = node.symbols.get(name)
-    if not word:
-        throw_error('tick: undefined word ' + name)
-    node.compile_constant(word)
+    node.compile_constant(p.read_ref())
 
 @directive('coord')
 def _coord(_):
