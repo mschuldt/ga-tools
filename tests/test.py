@@ -414,6 +414,15 @@ def run_tests():
          ''',
          None,
          {1: {'ram': [5, 349, 261, 4, 3, 84402]}})
+
+    case("'",
+         '''node 1
+          ' 0b101 ' io ' -d-u ' testname
+         : testname dup ;
+         ''',
+         None,
+         {1: {'ram': [23831, 5, 349, 261, 5, 153010]}})
+
 def error(coord, asm_type, name, msg):
     print('Node', coord, asm_type,
           "Error: Test '{}' - {}".format(name, msg))
