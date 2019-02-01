@@ -82,14 +82,17 @@ def parse_int(s):
     except ValueError:
         return None
 
-def node_ports(coord):
-    # Returns a tuple of addresses: (north, east, south, west)
+def node_port_names(coord):
     x = coord % 100
     y = coord // 100
-    return ((DOWN, UP)[y % 2],
-            (RIGHT, LEFT)[x % 2],
-            (UP, DOWN)[y % 2],
-            (LEFT, RIGHT)[x % 2])
+    return (('down', 'up')[y % 2],
+            ('right', 'left')[x % 2],
+            ('up', 'down')[y % 2],
+            ('left', 'right')[x % 2])
+
+def node_ports(coord):
+    # Returns a tuple of addresses: (north, east, south, west)
+    return tuple(named_addresses[a] for a in node_port_names(coord))
 
 def check_op(op):
     if op not in op_i:
