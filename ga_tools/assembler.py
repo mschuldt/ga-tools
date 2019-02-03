@@ -380,7 +380,7 @@ def do_compile():
     for chip in get_chips().values():
         chip.compile_nodes()
 
-def print_nodes(simple=False):
+def print_nodes(simple=False, coord=None):
     chips = get_chips()
     print_names = len(chips) > 1
     for name, chip in chips.items():
@@ -389,4 +389,5 @@ def print_nodes(simple=False):
         nodes = list(chip.nodes.values())
         nodes.sort(key=lambda x: x.coord)
         for node in nodes:
-            node.print(simple)
+            if coord is None or node.coord == coord:
+                node.print(simple)
