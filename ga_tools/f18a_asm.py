@@ -556,4 +556,3 @@ class Stream(F18a):
             # reserve space for stream logic
             count += 3
         return count
-

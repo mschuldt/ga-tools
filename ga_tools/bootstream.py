@@ -23,6 +23,23 @@ class Bootstream:
                 ('push', '.', '.', '.'),
                 ('@p', '!+', 'unext', '.')]
 
+    @staticmethod
+    def set_a(value):
+        return [('@p', 'a!', '.', '.'),
+                value]
+
+    @staticmethod
+    def set_b(value):
+        return [('@p', 'b!', '.', '.'),
+                value]
+
+    @staticmethod
+    def set_io(value):
+        return [('@p', '@p', 'b!', '.'),
+                value,
+                0x15D, # io
+                ('!b', '.', '.', '.')]
+
     def start_node(self):
         return self.chip.node(self.start_coord)
 
@@ -35,6 +52,15 @@ class Bootstream:
             coord += coord_changes[direction]
             nodes.append(self.chip.node(coord))
         return reversed(nodes)
+
+    def add_init_code(self, stream, node):
+        if node.init_a:
+            stream.extend(node.asm_words(self.set_a(node.init_a)))
+        if node.init_io:
+            stream.extend(node.asm_words(self.set_a(node.init_io)))
+        if node.init_b:
+            stream.extend(node.asm_words(self.set_a(node.init_b)))
+        stream.append(node.asm_word(('jump', node.start_addr())))
 
     def node_code(self, node, iport, oport, stream):
         # IPORT stream input port. OPORT output port
@@ -50,7 +76,7 @@ class Bootstream:
         if code:
             s.extend(code)
             s.extend(node.assemble_boot_code())
-            s.append(node.asm_word(('jump', node.start_addr())))
+            self.add_init_code(s, node)
         return s
 
     def head_frame(self):
