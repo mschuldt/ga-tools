@@ -22,7 +22,7 @@ class GA144:
     def node(self, coord):
         n = self.nodes.get(coord)
         if not n:
-            n = F18a(coord)
+            n = F18a(self, coord)
             self.set_rom(n)
             self.nodes[coord] = n
         return n
@@ -71,7 +71,7 @@ class GA144:
             node.symbols[name] = Word(addr=addr)
 
     def new_stream(self, coord, into):
-        s = Stream(self.node(coord), into=into)
+        s = Stream(self, self.node(coord), into=into)
         self.nodes[s.name] = s
         return s
 

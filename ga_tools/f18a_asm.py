@@ -1,9 +1,11 @@
 
+import re
+
 from .defs import *
 from .word import *
 
 class F18a:
-    def __init__(self, coord):
+    def __init__(self, chip, coord):
         #self.rom = None
         self.symbols = {} # maps names to Word objects
         self.symbol_names = []
@@ -17,6 +19,7 @@ class F18a:
         self.stack = []
         self.prev_op = None
         self.boot_code = False
+        self.chip = chip
         self.coord = coord
         self.port_addrs = node_ports(coord)
         self.node_port_names = node_port_names(coord)
@@ -65,6 +68,18 @@ class F18a:
     def finish_word(self):
         # fill rest of current_word with nops
         pass
+
+    def make_ref(self, name):
+        try:
+            return Ref(node=self, value=int(name, 0))
+        except ValueError as e:
+            pass
+        m = re.search('([^ ]+)@([0-9]+)', name)
+        word = m.group(1) if m else name
+        location = self.chip.node(int(m.group(2))) if m else self
+        if word in port_names:
+            word = self.node_port_names[port_names.index(name)]
+        return Ref(node=location, name=word)
 
     def new_word(self, set_current=True):
         # start a new word. return it
@@ -205,15 +220,6 @@ class F18a:
     def add_asm_word(self, w):
         self.asm.append(w)
 
-    def get_const(self, word):
-        if type(word) == int:
-            return word
-        if len(word)==1:
-            n = parse_int(word[0])
-            if n is not None:
-                return n
-        return None
-
     def finish(self):
         # Finish assembling this node
 #        if self.current_word.empty():
@@ -238,14 +244,21 @@ class F18a:
                 self.last_word = None
         self.finished = True
 
+    def get_asm_ref(self, word):
+        if type(word) == int:
+            return Ref(node=self, value=word)
+        if len(word)==1 and word[0] not in ops:
+            return self.make_ref(word[0])
+        return None
+
     def do_asm_word(self, ops, word):
-        const = self.get_const(ops)
+        const = self.get_asm_ref(ops)
         if const is not None:
             word.set_const(const)
         else:
             for op in ops:
                 if op in address_required:
-                    word.set_call(op, Ref(node=self, name=ops[-1]))
+                    word.set_call(op, self.make_ref(ops[-1]))
                     return word
                 else:
                     word.set_op(op)
@@ -507,8 +520,8 @@ class F18a:
 
 class Stream(F18a):
     counter = 0
-    def __init__(self, node, address=0x195, into=None):
-        super(Stream, self).__init__(node.coord)
+    def __init__(self, chip, node, address=0x195, into=None):
+        super(Stream, self).__init__(chip, node.coord)
         self.node = node
         self.address = address
         self.into = into # store instruction: ! !b !p
