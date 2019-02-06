@@ -108,6 +108,20 @@ def _unext(_):
 def _unext_comma(_):
     node.compile_op('unext')
 
+def compile_without_nop(op):
+    x = node.auto_nop_insert
+    node.auto_nop_insert = False
+    node.compile_op(op)
+    node.auto_nop_insert = x
+
+@directive('+,')
+def _plus(_):
+    compile_without_nop('+')
+
+@directive('+*,')
+def _plus(_):
+    compile_without_nop('+*')
+
 @directive('end')
 def _end(_):
     node.compile_next('end')
