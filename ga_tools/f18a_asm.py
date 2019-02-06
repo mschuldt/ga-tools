@@ -69,14 +69,21 @@ class F18a:
         # fill rest of current_word with nops
         pass
 
+    def parse_ref(self, name):
+        m = re.search('([^ ]+)@([0-9]+)', name)
+        if m:
+            return m.group(1), self.chip.node(int(m.group(2)))
+        m = re.search('([0-9]+)[.]([^ ]+)', name)
+        if m:
+            return m.group(2), self.chip.node(int(m.group(1)))
+        return name, self
+
     def make_ref(self, name):
         try:
             return Ref(node=self, value=int(name, 0))
         except ValueError as e:
             pass
-        m = re.search('([^ ]+)@([0-9]+)', name)
-        word = m.group(1) if m else name
-        location = self.chip.node(int(m.group(2))) if m else self
+        word, location = self.parse_ref(name)
         if word in port_names:
             word = self.node_port_names[port_names.index(name)]
         return Ref(node=location, name=word)
