@@ -33,6 +33,7 @@ class F18a:
         self.init_a = None
         self.init_b = None
         self.init_p = None
+        self.init_io = None
         self.stream = False
         self.name = None
 

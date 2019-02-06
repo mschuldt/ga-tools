@@ -223,6 +223,10 @@ def _init_b(p):
 def _init_p(p):
     node.init_p = read_ref(p)
 
+@directive('/io')
+def _init_io(p):
+    node.init_io = read_ref(p)
+
 def read_stream_options(r):
     into, thru = None, None
     while True:
