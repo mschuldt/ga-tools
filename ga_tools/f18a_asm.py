@@ -79,6 +79,8 @@ class F18a:
         return name, self
 
     def make_ref(self, name):
+        if type(name) is int:
+            return Ref(node=self, value=name)
         try:
             return Ref(node=self, value=int(name, 0))
         except ValueError as e:
