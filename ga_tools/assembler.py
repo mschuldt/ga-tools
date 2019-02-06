@@ -95,6 +95,10 @@ def _for(_):
 def _next(_):
     node.compile_next('next')
 
+@directive('next:')
+def _if_label(p):
+    node.compile_call('next', node.make_ref(p.read_word()))
+
 @directive('unext')
 def _unext(_):
     node.compile_op('unext')
