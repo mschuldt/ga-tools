@@ -1,5 +1,5 @@
-![logo](/images/logo_411x150.png)
-
+![logo](/images/logo_150.png)
+---
 Alternative tools for the [GA144](http://www.greenarraychips.com/home/products/index.html) multi-computer chip using Python3.
 
 These tools are provided as a simple CLI tool and a Python3 library.
