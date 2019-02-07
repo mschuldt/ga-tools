@@ -1,0 +1,10 @@
+
+node 1
+: name! @p drop !p ;
+: name@ 0 ;
+
+: main
+5 name! \ set variable
+  name@ \ read variable
+
+  name@ 1 . + name! \ increment
