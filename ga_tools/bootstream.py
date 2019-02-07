@@ -24,19 +24,19 @@ class Bootstream:
                 ('@p', '!+', 'unext', '.')]
 
     @staticmethod
-    def set_a(value):
+    def set_a(node):
         return [('@p', 'a!', '.', '.'),
-                value]
+                node.init_a.resolve()]
 
     @staticmethod
-    def set_b(value):
+    def set_b(node):
         return [('@p', 'b!', '.', '.'),
-                value]
+                node.init_b.resolve()]
 
     @staticmethod
-    def set_io(value):
+    def set_io(node):
         return [('@p', '@p', 'b!', '.'),
-                value,
+                node.init_io.resolve(),
                 0x15D, # io
                 ('!b', '.', '.', '.')]
 
@@ -55,11 +55,11 @@ class Bootstream:
 
     def add_init_code(self, stream, node):
         if node.init_a:
-            stream.extend(node.asm_words(self.set_a(node.init_a)))
+            stream.extend(node.asm_words(self.set_a(node)))
         if node.init_io:
-            stream.extend(node.asm_words(self.set_a(node.init_io)))
+            stream.extend(node.asm_words(self.set_io(node)))
         if node.init_b:
-            stream.extend(node.asm_words(self.set_a(node.init_b)))
+            stream.extend(node.asm_words(self.set_b(node)))
         stream.append(node.asm_word(('jump', node.start_addr())))
 
     def node_code(self, node, iport, oport, stream):
