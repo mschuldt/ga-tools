@@ -8,7 +8,7 @@
 \ 608...206 - wire nodes for sending data from sram to async port
 
 \ run with:
-\     ga sram-demo.ga --port /dev/ttyUSB0 --listen
+\     ga sram-demo.ga --port /dev/ttyUSB0
 \
 \ Expected output:
 \    0
@@ -71,7 +71,7 @@ node 708
 include 708serial.ga
 : main
 io b! south a!
-15 for @ out18 next
+15 for @ send next
 exit
 
 
