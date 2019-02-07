@@ -1,0 +1,53 @@
+\ code from AB004:
+\   http://www.greenarraychips.com/home/documents/greg/AB004-141021-PORTEX.pdf
+\ Read that document if this code does not make sense.
+
+\ Node 608 is in port execution mode and is used by node 708
+\ as a random access 64 word array
+
+\ Write test values into the ram, then read them back and send
+\ them back via 708 serial.
+
+\ Output: numbers even numbers from 0 to 20
+
+node 608
+: main r---
+
+
+node 708
+: set ( a )
+    @p ! ! ;
+    .. @p a! ..
+: @next ( -n )
+    @p ! @ ;
+    .. @+ !p ..
+: !next ( n )
+    @p ! ! ;
+    .. @p !+ ..
+: fetch ( a-n ) set @next ;
+: store ( na ) set !next ;
+
+\ ---------------------------------
+\  test section
+include 708serial.ga
+: set-array \ store 2*i at index i
+\ Could also use 'set' and '!next' here
+\ instead of manually handling the index
+ 0 ( index)
+ 10 for
+    dup dup . + ( 2*index )
+ over ( index )
+ store
+ 1 . + ( increment index )
+ next ;
+
+: print-array \ read and print the stored values
+ 0 set
+ 10 for
+  @next send
+ next ;
+
+: main
+ right a!
+ set-array
+ print-array
