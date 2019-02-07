@@ -508,7 +508,7 @@ class F18a:
             print('/b', self.init_b)
         if self.boot:
             print(': boot')
-            print_list(self.boot)
+            self.print_list(self.boot)
             print('- '*27)
         names = {w.word_addr:s for s,w in self.symbols.items()}
         self.print_list(self.ram, names)
