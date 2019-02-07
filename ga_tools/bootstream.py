@@ -73,10 +73,9 @@ class Bootstream:
         # then load this nodes code into ram
         code = node.assemble(check_size=True)
         s.extend(node.asm_words(self.load_pump(len(code))))
-        if code:
-            s.extend(code)
-            s.extend(node.assemble_boot_code())
-            self.add_init_code(s, node)
+        s.extend(code)
+        s.extend(node.assemble_boot_code())
+        self.add_init_code(s, node)
         return s
 
     def head_frame(self):
