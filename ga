@@ -24,6 +24,9 @@ parser.add_argument('--baud',
 parser.add_argument('--json',
                     nargs=-1,
                     help='Dump compiled data in json format')
+parser.add_argument('--outfile',
+                    nargs=1,
+                    help='filename to write json data to')
 parser.add_argument('--print',
                     nargs=-1,
                     help='Pretty print assembled node data')
@@ -64,6 +67,7 @@ print_json = args.json is not None
 print_pretty = args.print is not None or args.print_simple is not None
 print_size = args.size is not None
 select_node = None
+outfile = args.outfile[0] if args.outfile else None
 
 if args.node:
     select_node = int(args.node[0])
@@ -108,8 +112,15 @@ if print_json:
         bs = bootstream_type
     data = chip.json(bs)
     data['version'] = ga_tools.version
-    print(json.dumps(data))
-    exit()
+    dump = json.dumps(data)
+    if outfile:
+        f = open(outfile, 'w')
+        f.write(dump)
+        f.close()
+    else:
+        print(dump)
+    if args.sim is None:
+        exit()
 
 if args.port is None:
     Exception('--port argument is required')
