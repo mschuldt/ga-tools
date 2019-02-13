@@ -121,6 +121,16 @@ class Word:
                 w |= self._addr & addr_masks[self.op_index]
         return w
 
+    def aforth_list(self):
+        if self.type == CONST:
+            return self.get_const(True) & 0x3ffff
+        if self.type == INST:
+            return [ops[op] if op else '.' for op in self._slots]
+        if self.type == ADDR:
+            x = [ops[op] for op in range(self.op_index)]
+            x.append(self._addr)
+            return x
+
     def disasm(self, w):
         # disassemble W into this object
         # TODO: to properly disassemble addresses need to know P

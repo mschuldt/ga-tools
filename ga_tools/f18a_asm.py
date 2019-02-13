@@ -368,6 +368,14 @@ class F18a:
     def assemble_boot_code(self):
         return self.assemble_list(self.boot)
 
+    def aforth_list(self):
+        ret = []
+        word = self.ram
+        while word:
+            ret.append(word.aforth_list())
+            word = word.next
+        return ret
+
     def resolve_calls(self):
         # Set the symbol address in each word
         word = self.ram
@@ -521,12 +529,16 @@ class F18a:
             word = word.next
 
     def json(self):
-        data = {'ram': self.assemble()}
-        data['boot_code'] = self.assemble_boot_code()
-        data['start_addr'] = self.start_addr(False)
-        data['symbols'] = {n:w.word_addr
-                           for n,w in self.symbols.items()}
-        return data
+        return {'coord': self.coord,
+                'ram': self.assemble(),
+                'forth': self.aforth_list(),
+                'boot_code': self.assemble_boot_code(),
+                'symbols': {n:w.word_addr
+                            for n,w in self.symbols.items()},
+                'a': self.init_a.resolve() if self.init_a else None,
+                'b': self.init_b.resolve() if self.init_b else None,
+                'p': self.start_addr(False),
+                'io': self.init_io.resolve() if self.init_io else None}
 
 class Stream(F18a):
     counter = 0

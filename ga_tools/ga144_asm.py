@@ -81,11 +81,14 @@ class GA144:
             if node.stream:
                 del self.nodes[coord]
 
-    def json(self, bootstream_type=None):
-        data = {coord:node.json() for coord, node in self.nodes.items()}
+    def json(self, bootstream_type=None, simulation=False):
+        data = {'nodes': {coord:node.json() for coord, node
+                          in self.nodes.items()}}
         if bootstream_type:
             bs = make_bootstream(bootstream_type, self)
-            data['bootstream'] = bs.stream()
+            data['bootstream'] = {'type':bootstream_type,
+                                  'node': bs.start_coord,
+                                  'stream': bs.stream(not simulation)}
         return data
 
     def print_size(self):

@@ -5,6 +5,7 @@
 # ::::Tools
 
 import argparse
+import os
 
 import ga_tools
 
@@ -117,8 +118,9 @@ if print_json:
     bs = None
     if args.bootstream is not None:
         bs = bootstream_type
-    data = chip.json(bs)
+    data = chip.json(bs, args.sim is not None)
     data['version'] = ga_tools.version
+    data['file'] = os.path.abspath(args.file)
     dump = json.dumps(data)
     if outfile:
         f = open(outfile, 'w')
