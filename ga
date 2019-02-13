@@ -48,6 +48,9 @@ parser.add_argument('--print-simple',
 parser.add_argument('--node',
                     nargs=1,
                     help='Selects a single node for print options')
+parser.add_argument('--sim',
+                    nargs=-1,
+                    help='Run the GA144 simulator')
 parser.add_argument('--version',
                     nargs=-1,
                     help='GA-tools version')
@@ -105,6 +108,10 @@ if print_pretty:
     ga_tools.print_nodes(args.print_simple is not None, select_node)
     exit()
 
+if args.sim is not None:
+    import tempfile
+    print_json = True
+    outfile = tempfile.NamedTemporaryFile().name
 if print_json:
     import json
     bs = None
@@ -124,6 +131,11 @@ if print_json:
 
 if args.port is None:
     Exception('--port argument is required')
+
+if args.sim is not None:
+    import subprocess
+    subprocess.call(["ga-sim", outfile])
+    exit()
 
 chip.set_serial(args.port[0], args.baud[0])
 chip.write_bootstream(bootstream_type)
