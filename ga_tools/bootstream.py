@@ -125,8 +125,12 @@ class AsyncBootstream(Bootstream):
                      + nenw + nenw + nenw + [NORTH] + [EAST]*7)
         self.start_coord = 708
 
-    def stream(self):
-        return self.sget_convert(super(AsyncBootstream, self).stream())
+    def stream(self, serial_convert=True):
+        s = super(AsyncBootstream, self).stream()
+        if serial_convert:
+            # Option to not do conversion for use by the simulator
+            return self.sget_convert(s)
+        return s
 
     def sget_convert(self, stream):
         new = []
