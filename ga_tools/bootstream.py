@@ -26,17 +26,17 @@ class Bootstream:
     @staticmethod
     def set_a(node):
         return [('@p', 'a!', '.', '.'),
-                node.init_a.resolve()]
+                node.get_init_a()]
 
     @staticmethod
     def set_b(node):
         return [('@p', 'b!', '.', '.'),
-                node.init_b.resolve()]
+                node.get_init_b()]
 
     @staticmethod
     def set_io(node):
         return [('@p', '@p', 'b!', '.'),
-                node.init_io.resolve(),
+                node.get_init_io(),
                 0x15D, # io
                 ('!b', '.', '.', '.')]
 

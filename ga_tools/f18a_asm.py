@@ -319,6 +319,15 @@ class F18a:
             return self.init_p.resolve()
         return 0
 
+    def get_init_a(self):
+        return self.init_a.resolve() if self.init_a else None
+
+    def get_init_b(self):
+        return self.init_b.resolve() if self.init_b else None
+
+    def get_init_io(self):
+        return self.init_io.resolve() if self.init_io else None
+
     def symbol_addr(self, name):
         # return address of symbol NAME, or None if it's not known yet
         w = self.symbols.get(name)
@@ -535,10 +544,10 @@ class F18a:
                 'boot_code': self.assemble_boot_code(),
                 'symbols': {n:w.word_addr
                             for n,w in self.symbols.items()},
-                'a': self.init_a.resolve() if self.init_a else None,
-                'b': self.init_b.resolve() if self.init_b else None,
+                'a': self.get_init_a(),
+                'b': self.get_init_b(),
                 'p': self.start_addr(False),
-                'io': self.init_io.resolve() if self.init_io else None}
+                'io': self.get_init_io()}
 
 class Stream(F18a):
     counter = 0
