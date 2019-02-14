@@ -376,8 +376,13 @@ def process_aforth(coord, data):
 def process_asm(coord, data):
     node.asm_node = True
     for line in data.tokens:
-        if type(line) is Token:
-            exit()
+        if len(line) == 1:
+            fn = directives.get(line[0].value)
+            if fn:
+                fn(None)
+                continue
+        if type(line) is not list:
+            throw_error('why?')
         ops = [t.value for t in line]
         node.asm_word(ops, add_to_node=True)
 

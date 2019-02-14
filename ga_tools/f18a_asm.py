@@ -278,6 +278,8 @@ class F18a:
         if add_to_node:
             if ops[0] == ':':
                 self.next_asm_symbol = ops[1]
+                if self.boot_code:
+                    self.end_boot_code()
                 return None
             if self.next_asm_symbol:
                 self.symbols[self.next_asm_symbol] = self.current_word
