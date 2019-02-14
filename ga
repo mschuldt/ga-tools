@@ -113,6 +113,7 @@ if args.sim is not None:
     import tempfile
     print_json = True
     outfile = tempfile.NamedTemporaryFile().name
+
 if print_json:
     import json
     bs = None
@@ -131,12 +132,13 @@ if print_json:
     if args.sim is None:
         exit()
 
-if args.port is None:
-    Exception('--port argument is required')
-
 if args.sim is not None:
     import subprocess
     subprocess.call(["ga-sim", outfile])
+    exit()
+
+if not args.port:
+    print('Error: --port argument is required')
     exit()
 
 chip.set_serial(args.port[0], args.baud[0])
