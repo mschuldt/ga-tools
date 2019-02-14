@@ -331,24 +331,31 @@ class F18a:
             return None
         return w.word_addr
 
-    def set_word_addresses(self):
+    def do_set_word_addresses(self, word):
         # Set the address in ram of each word
         a = 0
-        word = self.ram
         while word:
             word.word_addr = a
             word = word.next
             a += 1
 
-    def resolve_transfers(self):
+    def set_word_addresses(self):
+        # Set the address in ram of each word
+        self.do_set_word_addresses(self.ram)
+        self.do_set_word_addresses(self.boot)
+
+    def do_resolve_transfers(self, word):
         # Set the transfer address in each word
-        word = self.ram
         while word:
             if word.dest_word:
                 addr = word.dest_word.word_addr
                 assert addr is not None
                 word.set_addr(addr)
             word = word.next
+
+    def resolve_transfers(self):
+        self.do_resolve_transfers(self.ram)
+        self.do_resolve_transfers(self.boot)
 
     def assemble_list(self, lst):
         # Assembles a linked list of words
@@ -381,24 +388,30 @@ class F18a:
             word = word.next
         return ret
 
-    def resolve_calls(self):
+    def do_resolve_calls(self, word):
         # Set the symbol address in each word
-        word = self.ram
         while word:
             if word.addr_sym:
                 word.resolve_symbol()
             word = word.next
 
-    def shift_addr_words(self):
+    def resolve_calls(self):
+        self.do_resolve_calls(self.ram)
+        self.do_resolve_calls(self.boot)
+
+    def do_shift_addr_words(self, word):
         # Move transfer to new word if it doesn't fit.
         # It's fast enough
-        word = self.ram
         while word:
             if not self.word_addr_fits(word):
                 self.shift_addr_word(word)
                 self.set_word_addresses()
                 word = self.ram
             word = word.next
+
+    def shift_addr_words(self):
+        self.do_shift_addr_words(self.ram)
+        self.do_shift_addr_words(self.boot)
 
     def word_addr_fits(self, word, p=None):
         # Return True if the address WORD its in the available slots
@@ -435,12 +448,15 @@ class F18a:
         if new.next is None:
             self.last_word = new
 
-    def insert_streams(self):
-        word = self.ram
+    def do_insert_streams(self, word):
         while word:
             if word.stream:
                 self.insert_stream(word, word.stream)
             word = word.next
+
+    def insert_streams(self):
+        self.do_insert_streams(self.ram)
+        self.do_insert_streams(self.boot)
 
     def insert_stream(self, word, stream):
         # replace WORD with the words in STREAM
