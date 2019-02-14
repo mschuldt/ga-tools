@@ -11,7 +11,7 @@ include 708serial.ga
 if send main then exit ;
 
 node 608
-: boot south b! north a! ;
+boot south b! north a!
 
 : write ( xa - )
 - !b !b ;
@@ -31,7 +31,7 @@ node 608
 
 
 node 508 ( ram node )
-: boot north b! 0 a! ;
+boot north b! 0 a!
 \ org 60
 org 40
 : read

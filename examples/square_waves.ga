@@ -1,6 +1,6 @@
 
 node 517 \ J36.2
-: boot io b!
+boot io b!
 : unext_delay 0x3ffff for unext ;
 : unext_delay2 0x3ffff for . . . unext ;
 \ 307Hz

@@ -313,7 +313,7 @@ class Parser:
         from_port = self.read_port_name()
         to_port = self.read_port_name()
         # TODO: faster wire code - double unext with preloaded stacks
-        code = ''': boot {} a! {} b!
+        code = '''boot {} a! {} b!
         : loop 0x3ffff for @ !b unext loop'''.format(from_port, to_port)
         source = '<wire_{}_{}>'.format(from_port, to_port)
         self.include_string(code, source)
