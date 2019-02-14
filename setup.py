@@ -18,6 +18,7 @@ setup(name='ga-tools',
       download_url='https://github.com/mschuldt/ga-tools_wizard/archive/{}.tar.gz'.format(version),
 
       scripts=['ga'],
+      install_requires=['pyserial'],
       classifiers=[
           'Environment :: Console',
           'Intended Audience :: Developers',
