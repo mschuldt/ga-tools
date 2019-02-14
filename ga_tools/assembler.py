@@ -206,7 +206,15 @@ def _comma(p):
 
 @directive("'")
 def _tick(p):
-    node.compile_constant(read_ref(p))
+    word = p.read_word()
+    # symbols.get is type Word, read_ref is type Ref
+    # functions like compile_next expect a word to be on the stack,
+    # not a reference.
+    # todo - fix this by using references for everything.
+    value = node.symbols.get(word)
+    if not value:
+        throw_error('tick: undefined word ' + str(word))
+    node.push(value)
 
 @directive('coord')
 def _coord(_):
