@@ -103,6 +103,12 @@ class GA144:
 def get_chips():
     return chips
 
+def get_chip(name=None):
+    if name is not None:
+        return get_chips().get(name)
+    chips = list(get_chips().values())
+    return len(chips) and chips[0]
+
 def reset():
     global chips
     chips = {}
