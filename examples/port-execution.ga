@@ -51,3 +51,4 @@ include 708serial.ga
  right a!
  set-array
  print-array
+ exit
