@@ -460,7 +460,7 @@ def disasm_ram(node, expect):
     print()
 
 def cmp_json(asm_type, name, node, expect):
-    json = node.json()
+    json = node.json()['nodes']
     #print('json:', json)
     for coord in expect.keys():
         if coord not in json:
@@ -509,8 +509,8 @@ def case(name, aforth, asm, expect, fn=lambda chip: True):
         ok = cmp_json('Aforth', name, chip, expect)
         ok = ok and fn(chip)
     if asm:
-        chip = chips.get('test_aforth')
-        ok = cmp_json('ASM', name, chips.get('test_asm'), expect) and ok
+        chip = chips.get('test_asm')
+        ok = cmp_json('ASM', name, chip, expect) and ok
         ok = ok and fn(chip)
     tests_run += 1
     if not ok:
