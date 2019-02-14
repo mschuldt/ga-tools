@@ -59,7 +59,7 @@ use option `--no-listen` to disable that.
 `ga FILE.ga --json` prints the assembled program as JSON.
 The bootstream is included with the `--bootstream TYPE` option.
 
-use the `--outfile NAME` option to direct the JSON output to a file.
+Use the `--outfile NAME` option to direct the JSON output to a file.
 
 ## Disabling optimization
 The `--disable-0-opt` option prevents compiling '0' as 'dup dup or'.
@@ -75,7 +75,7 @@ provided by Greenarrays.
 The second form is called `ASM` and is closer to a traditional assembly
 language, with one line of source for every machine word.
 This form is used when full transparency is needed
-and can be useful for writing some kinds of optimization.
+and can be useful for writing some kinds of optimizations.
 
 Both forms support the same basic instruction set.
 Read about it [here](https://mschuldt.github.io/www.colorforth.com/inst.htm) or in the [F18a Product Brief](http://www.greenarraychips.com/home/documents/greg/PB003-110412-F18A.pdf).
@@ -86,7 +86,7 @@ Both forms are case insensitive.
 Aforth provides convient layer above raw assembly,
 bringing its syntax closer to that of the Forth.
 It allows reuse of existing code for the ga144 and helps with
-use and comprehension of the valuable documentation from Greenarrays.
+the use and comprehension of the valuable documentation from Greenarrays.
 Additionally aforth syntax is easier for compilers to generate.
 
 Aforth is intended to remain compatible with the output of the [chlorophyll](https://github.com/mangpo/chlorophyll) compiler.
@@ -119,10 +119,9 @@ For more serious programming the [F18A Technology reference](http://www.greenarr
 and [GA144 Chip Reference](http://www.greenarraychips.com/home/documents/greg/DB002-110705-G144A12.pdf)
 are very useful.
 
-colorforth.com contained many pages useful for programming the ga144,
-the site is down but mirrored here: [colorforth.com](https://mschuldt.github.io/www.colorforth.com/)
-A list of useful colorforth.com links specific to the GA144 has been
-collected [here](https://github.com/mschuldt/www.colorforth.com)
+colorforth.com contained many pages useful for programming the ga144.
+The site is down so links here are for a mirrored copy,
+a list of useful links has been collected [here](https://github.com/mschuldt/www.colorforth.com).
 
  - [Instructions](https://mschuldt.github.io/www.colorforth.com/inst.htm)
 
@@ -153,36 +152,36 @@ This version of aforth differs from arrayforth supported by Greenarrays
 in several ways. Knowing the differences is helpful if you already
 know arrayforth or if you want to use the Greenarrays documentation.
 
-    - No semantic color
-        - standard forth syntax for words and comments
-        - hex,bin literals: 0xN, 0bN
-        - boot descriptors and other yellow words are reserved keywords.
-     - ~north~, ~east~, ~south~, and ~west~
-         get resolved to correct ports: ~up~, ~down~, ~left~, or ~right~
-     - Each node has a seporate namespace
-         - word@coord compiles a call to =word= in node =coord=.
-         - The word ~reclaim~ has no use.
-     - Automatic nop insertion.
-        - Can be disabled.
-        - Currently inserts nops even when not actually needed
-     - Arguments follow the yellow words.
-         For example, use ~'node 715'~ instead of ~'715 node'~.
-     - Generalized host computations during compilation are not supported.
-         The compiler is not a forth interpreter.
-     - There are no grey words
-     - Automatically shift words when destination address does not fit in word.
-        arrayforth does not compile in such situations, manual word alignment is necessary
-     - words may be called before their definition
-     - aforth does not support multiple labels at the same location
+- No semantic color
+   - standard forth syntax for words and comments
+   - hex,bin literals: 0xN, 0bN
+   - boot descriptors and other yellow words are reserved keywords.
+- ~north~, ~east~, ~south~, and ~west~
+    get resolved to correct ports: ~up~, ~down~, ~left~, or ~right~
+- Each node has a seporate namespace
+    - word@coord compiles a call to =word= in node =coord=.
+    - The word ~reclaim~ has no use.
+- Automatic nop insertion.
+   - Can be disabled.
+   - Currently inserts nops even when not actually needed
+- Arguments follow the yellow words.
+    For example, use ~'node 715'~ instead of ~'715 node'~.
+- Generalized host computations during compilation are not supported.
+    The compiler is not a forth interpreter.
+- There are no grey words
+- Automatically shift words when destination address does not fit in word.
+   arrayforth does not compile in such situations, manual word alignment is necessary
+- words may be called before their definition
+- aforth does not support multiple labels at the same location
 
 # Other GA144 tools
 
- * ga144tools (https://github.com/jamesbowman/ga144tools)[https://github.com/jamesbowman/ga144tools]
+ * ga144tools [https://github.com/jamesbowman/ga144tools](https://github.com/jamesbowman/ga144tools)
    - Assembler similar to the ASM supported here
    - Includes a flash based virtual machine and compiler for it.
 
  * Chlorophyll [https://github.com/mangpo/chlorophyll](https://github.com/mangpo/chlorophyll)
-  - A high level c-like language with automatic partitioning for the ga144
+   - A high level c-like language with automatic partitioning for the ga144
 
  * Arrayforth [from Greenarrays](http://www.greenarraychips.com/home/support/download-02b.html)
 
