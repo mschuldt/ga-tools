@@ -1,17 +1,21 @@
 
 node 517 \ J36.2
 boot io b!
-: unext_delay 0x3ffff for unext ;
-: unext_delay2 0x3ffff for . . . unext ;
-\ 307Hz
+: delay 0x3ffff for . . . unext ;
 : setup 0x30000 0x20000 over over over over over over over over ;
-: 3.2ms setup : loop !b unext_delay2 loop ;
+
+\ 307Hz
+: 3_2ms setup : loop !b delay loop ;
+
 \ 37.2Mhz
 : 27ns 0x30000 !b 0x20000 !b 27ns ;
+
 \ 58.8Mhz
 : 17ns setup : 17ns_loop !b 17ns_loop ;
+
 \ 82.7Mhz
 : 12ns setup : 12ns_loop 0x3ffff for !b unext 12ns_loop ;
+
 \ 82.7Mhz, less jitter
 \ 104.3Mhz with double !b, but asymmetrical
 : best
@@ -21,6 +25,10 @@ setup
 \ drop ( for larger high period with two double !b )
 .. !b ( !b ) unext, unext,
 
-: main
-17ns \ select square wave here
+: main \ select square wave here
+ 3_2ms
+\ 27ns
+\ 17ns
+\ 12ns
+\ best
 ;
