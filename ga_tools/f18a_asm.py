@@ -182,10 +182,6 @@ class F18a:
         self.fill_rest_with_nops()
         if self.boot_code:
             self.end_boot_code()
-
-        if name == 'boot':
-            self.boot_code = True
-            self.boot = self.current_word
         self.symbols[name] = self.current_word
 
     def compile_if(self, op):
@@ -524,7 +520,7 @@ class F18a:
         if self.init_b is not None:
             print('/b', self.init_b)
         if self.boot:
-            print(': boot')
+            print('- boot', '- '*24)
             self.print_list(self.boot)
             print('- '*27)
         names = {w.word_addr:s for s,w in self.symbols.items()}

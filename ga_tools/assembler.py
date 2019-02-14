@@ -45,6 +45,13 @@ def start_def(p):
     #     throw_error("name '{}' already defined (rom)".format(name))
     node.start_def(name)
 
+@directive('boot')
+def _start_boot(_):
+    if not node.current_word.empty() or node.current_word.prev:
+        throw_error('boot directive must be first in node definition')
+    node.boot_code = True
+    node.boot = node.current_word
+
 @directive('if')
 def _if(_):
     node.compile_if('if')
