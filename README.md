@@ -9,7 +9,7 @@ They support two forms of assembly, bootstream generation and loading.
 
 1. [Installation](#Installation)
 2. [First program](#First-program)
-3. [Usage](#Workflow)
+3. [Usage](#Usage)
 4. [Assembly syntax](#Assembly-syntax)
    1. [Aforth syntax](#aforth-syntax)
    2. [ASM syntax](#ASM-syntax)
@@ -18,7 +18,6 @@ They support two forms of assembly, bootstream generation and loading.
 7. [Documentation](#Documentation)
 8. [Example code](#Example-code)
 9. [GA144 Simulation](#GA144-Simulation)
-10. [Example code](#Example-code)
 
 # Installation
 To install from pypi, run: `pip3 install ga_tools`
@@ -156,16 +155,16 @@ know arrayforth or if you want to use the Greenarrays documentation.
    - standard forth syntax for words and comments
    - hex,bin literals: 0xN, 0bN
    - boot descriptors and other yellow words are reserved keywords.
-- ~north~, ~east~, ~south~, and ~west~
-    get resolved to correct ports: ~up~, ~down~, ~left~, or ~right~
+- `north`, `east`, `south`, and `west`
+    get resolved to correct ports: `up`, `down`, `left`, or `right`
 - Each node has a seporate namespace
     - word@coord compiles a call to =word= in node =coord=.
-    - The word ~reclaim~ has no use.
+    - The word `reclaim` has no use.
 - Automatic nop insertion.
    - Can be disabled.
    - Currently inserts nops even when not actually needed
 - Arguments follow the yellow words.
-    For example, use ~'node 715'~ instead of ~'715 node'~.
+    For example, use `'node 715'` instead of `715 node'`.
 - Generalized host computations during compilation are not supported.
     The compiler is not a forth interpreter.
 - There are no grey words
