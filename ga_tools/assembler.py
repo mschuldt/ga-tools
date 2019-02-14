@@ -216,6 +216,11 @@ def _tick(p):
         throw_error('tick: undefined word ' + str(word))
     node.push(value)
 
+@directive("lit")
+def _lit(p):
+    #TODO: values from ' are Words so this does not work
+    node.compile_constant(node.pop())
+
 @directive('coord')
 def _coord(_):
     node.compile_constant(node.coord)

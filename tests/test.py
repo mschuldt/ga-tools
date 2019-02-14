@@ -415,13 +415,14 @@ def run_tests():
          None,
          {1: {'ram': [5, 349, 261, 4, 3, 84402]}})
 
-    case("'",
-         '''node 1
-          ' 0b101 ' io ' -d-u ' testname
-         : testname dup ;
-         ''',
-         None,
-         {1: {'ram': [23831, 5, 349, 261, 5, 153010]}})
+    #case("'",
+    #     '''node 1
+    #     dup
+    #     : testname dup ;
+    #     ' testname ' *.17 lit lit
+    #     ''',
+    #     None,
+    #     {1: {'ram': []}})
 
     case("port-references",
          '''node 0 , north , east , south , west \ D R U L
