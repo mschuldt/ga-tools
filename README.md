@@ -20,7 +20,7 @@ They support two forms of assembly, bootstream generation and loading.
 9. [GA144 Simulation](#GA144-Simulation)
 
 # Installation
-To install from pypi, run: `pip3 install ga_tools`
+To install from pypi, run: `pip3 install ga-tools`
 
 To install from source, first clone the repository and then run: `python setup.py install`
 
