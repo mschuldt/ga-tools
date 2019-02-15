@@ -1,0 +1,115 @@
+
+\ See 3node-ram.ga for description
+\
+\ Taken from: https://github.com/jamesbowman/ga144tools/blob/master/src/nt.ga
+
+node 505 ASM
+ jump east
+
+node 507 ASM
+ jump west
+ 
+node 406 ASM
+ jump north
+
+node 506 ASM
+boot
+    @p b!
+      north
+: main
+    jump north
+: addr                      \ ( -- o )
+                            \ fetch byte address 0-383
+                            \ set A to bank
+                            \ o to offset 0-63
+    dup 2/
+    2/ 2/ 2/
+    2/ 2/ call tab
+      west                  \ 3 bank nodes
+      south
+      east
+: tab
+    pop + a!
+    @ a! @p
+      63
+    and ;
+
+: read
+    @b call addr
+    @p ! !
+      @p a! @ !p
+    @ !b ;
+
+: write
+    @b call addr
+    @p ! ! @p
+      @p a! . .
+      @p ! . .
+    ! @b ! ;
+
+: read_byte
+  @b dup dup
+  call addr
+  @p ! !
+    @p a! @ !p
+  2/ 2* or                \ low bit of addr
+  2* 2* 2*                \ 0 or 8
+  push @ next hibyte
+: lo8
+  @p and !b ;
+    255
+: hibyte
+  2/ unext jump lo8
+
+: write_byte
+    @b dup
+    call addr
+    @p ! !
+      @p a! . .
+    ! @b ! ;
+
+: erase
+    @b push @b
+: loop
+    dup call addr
+    @p ! ! @p
+      @p a! dup
+      or !
+    ! @p . +
+    1
+    next loop
+   ;
+
+
+\ test section ------------------
+\  ( same as 3-node-ram.ga )
+node 606 \ test node
+/a south /b north
+: write ( v a - )
+   { write@506 } ! ! ! ;
+: read ( a - v )
+  { read@506 } ! ! @ ;
+: erase ( a n - )
+  { erase@506 } ! ! ! ;
+
+: out !b ;
+: main
+\ write a=a*a, for each address a in ram
+191 for
+  pop dup push
+  dup dup dup + over write
+next
+
+\ read and print values
+191 for
+  pop dup push dup read out
+next
+
+node 708
+/a west
+include 708serial.ga
+: main
+191 for @ send next exit
+
+node 706 wire south east
+node 707 wire west east

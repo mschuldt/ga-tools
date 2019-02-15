@@ -8,9 +8,11 @@ Prints the first 15 numbers of the Fibonacci sequence
 Simple example of using port execution to
 utilize an adjacent node as a random access 64 word array.
 
-## 3-node-ram.ga
+## 3-node-ram.ga, 3-node-ram-ASM.ga
 3 node ram cluster.
 192 addressable words, word and byte addressable.
+
+3-node-ram-ASM.ga is the same thing with ASM syntax
 
 ## square_waves.ga
 Various ways of toggling a pin, with timing info.
