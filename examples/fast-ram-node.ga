@@ -1,41 +1,42 @@
-
-\ ga fast-ram-node.ga --port /dev/ttyUSB0
 \
-\ 61 word ram node
+\ 60 word ram node
 \  minimizes code needed in the client
+\
+\ ga fast-ram-node.ga --port /dev/ttyUSB0
+\ Output:
+\   2222
+\   1111
+\   [exit]
 
-
-node 708
-include 708serial.ga
-: main south a! @
-if send main then exit ;
-
-node 608
-boot south b! north a!
-
-: write ( xa - )
-- !b !b ;
-: read ( a - x )
-!b @b ;
-
-: main
-77 !
-1111 5 write
-
-2222 3 write
-\ 333 59 write
-
-3 read !
-5 read !
-0 ! \ exit
-
-
-node 508 ( ram node )
-boot north b! 0 a!
-\ org 60
-org 40
+\ RAM node
+node 508
+/b north
+org 60 \ Place code in upper 4 words of RAM
 : read
 a! @ !b
 : main
 @b -if: read
   - a! @b ! main ;
+
+
+\ Test client --------------------
+node 608
+/b south /a north
+: write ( xa - )
+   - !b !b ;
+: read ( a - x )
+   !b @b ;
+
+: main
+   1111 5 write
+   2222 3 write
+
+   3 read !
+   5 read !
+   0 ! \ exit
+
+node 708
+include 708serial.ga
+: main
+  south a! @
+  if send main then exit ;

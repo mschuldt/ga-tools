@@ -1,13 +1,13 @@
 
-\ sends 18 bit words from node 708
+\ Sends 18 bit words from node 708
 \ b must be set to io
 \
-\ example:
+\ Example:
 \
 \ node 708
 \ include 708serial.ga
 \ : main
-\  124 send
+\  124 send exit
 
 : send ( n - n )
     \ 18bit words sent using 4 bytes in order:

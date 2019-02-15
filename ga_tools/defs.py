@@ -105,7 +105,7 @@ def set_current_token(t):
     if t and t != '\n':
         current_token = t
 
-def throw_error(msg, print_source=True):
+def throw_error(msg, print_source=True, token=None):
     if current_token and print_source:
         print('Exception:', msg)
         print('   Source:' , current_token.source,

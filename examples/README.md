@@ -27,10 +27,16 @@ Simple example showing one way of implementing variables
 Uses a crystal to maintain time. 
 Prints counter and debug values over serial.
 
+## fast-ram-node.ga
+60 word RAM node with small client code (2 words)
+
 # library examples
 
 ## 708serial.ga
 serial communciation from node 708
+
+## 708serial-ASM.ga
+ASM syntax version of 708serial.ga
 
 ## 600serial.ga
 Like 708serial.ga, but for node 600
