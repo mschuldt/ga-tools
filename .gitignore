@@ -1,3 +1,9 @@
 __pycache__
 build
 *.pyc
+
+dist
+MANIFEST
+
+.emacs.desktop
+.emacs.desktop.lock
