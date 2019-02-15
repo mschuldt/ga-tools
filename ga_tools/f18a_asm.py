@@ -241,6 +241,8 @@ class F18a:
         if self.asm_node:
             if self.next_asm_symbol:
                 self.symbols[self.next_asm_symbol] = self.current_word
+        if self.boot_code:
+            self.end_boot_code()
         self.finished = True
 
     def trim_last_word(self):
