@@ -429,6 +429,7 @@ class F18a:
         mask = word_address_masks[word.op_index]
         _mask = ~mask & 0x3ffff
         p = word.word_addr + 1 if p is None else p
+        p += word._slots.count(OP_READ_P)
         min_dest = _mask & p
         max_dest = (_mask & p) | (mask & dest_addr)
         return (dest_addr >= min_dest) & (dest_addr <= max_dest)
