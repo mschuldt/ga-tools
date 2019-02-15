@@ -530,7 +530,7 @@ class F18a:
         #       -handle the word wrapping better...
         if simple:
             return self.simple_print()
-        print('\n'+'_'*53)
+        print('\n'+'='*53)
         print('      Compiled             Assembled     Disassembled')
         print('node ', self.coord, '  ASM' if self.asm_node else '')
         p = self.start_addr()

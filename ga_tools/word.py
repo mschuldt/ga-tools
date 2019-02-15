@@ -41,6 +41,9 @@ class Word:
             self.set_op(NOP)
 
     def set_op(self, op, final_slot=False):
+        if self.op_index > 3:
+            slots = [ops[self._slots[i]] for i in range(4)]
+            throw_error('slot overflow: {}, {}'.format(slots, op))
         self._slots[self.op_index] = get_op_i(op)
         if not final_slot:
             self.op_index += 1
