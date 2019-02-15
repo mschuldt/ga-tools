@@ -376,7 +376,7 @@ def process_aforth(coord, data):
 def process_asm(coord, data):
     node.asm_node = True
     for line in data.tokens:
-        if len(line) == 1:
+        if len(line) == 1 and line[0].value not in op_i:
             fn = directives.get(line[0].value)
             if fn:
                 fn(None)
