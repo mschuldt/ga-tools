@@ -60,7 +60,7 @@ class Bootstream:
             stream.extend(node.asm_words(self.set_io(node)))
         if node.init_b:
             stream.extend(node.asm_words(self.set_b(node)))
-        stream.append(node.asm_word(('jump', node.start_addr())))
+        return stream
 
     def node_code(self, node, iport, oport, stream):
         # IPORT stream input port. OPORT output port
@@ -76,6 +76,7 @@ class Bootstream:
         s.extend(code)
         s.extend(node.assemble_boot_code())
         self.add_init_code(s, node)
+        s.append(node.asm_word(('jump', node.start_addr())))
         return s
 
     def head_frame(self):
@@ -103,8 +104,17 @@ class Bootstream:
     def tail_frame(self):
         # create frame for boot node
         node = self.start_node()
+        boot = node.assemble_boot_code()
+        # TODO: Add this boot code earlier so it's visable with --print
+        # TODO: how else to do this?
+        boot.extend(self.add_init_code([],node))
         code = node.assemble()
-        return [node.start_addr(), 0, len(code)] + code
+        start = node.start_addr()
+        if boot:
+            boot.append(node.asm_word(('jump', start)))
+            start = max(len(code), 0)
+        code.extend(boot)
+        return [start, 0, len(code)] + code
 
     def stream(self):
         # creates the bootstream
