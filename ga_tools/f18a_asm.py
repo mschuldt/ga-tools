@@ -154,6 +154,9 @@ class F18a:
             self.fill_rest_with_nops()
 
     def compile_constant(self, const):
+        if self.asm_node:
+            self.set_next_const(const)
+            return
         if const == 0 and self.compile_0_as_dup_dup_or:
             self.compile_op(DUP)
             self.compile_op(DUP)
