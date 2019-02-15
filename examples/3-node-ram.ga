@@ -1,29 +1,41 @@
-\ pulled from: https://github.com/jamesbowman/ga144tools/blob/master/src/nt.ga
+\ 3 node ram cluster. 192 addressable words. Word and byte addressable.
+\
+\ Pulled from: https://github.com/jamesbowman/ga144tools/blob/master/src/nt.ga
+\
+\ Includes test code to write, read, and send test values.
+\ See 3-node-ram.ga for a version using ASM syntax.
+\
+\ Output:
+\ 382
+\ 380
+\ 378
+\ ...
+\ 4
+\ 2
+\ 0
+\ [exit]
 
-node 505
-/p east
+\ ram data nodes
+node 505 /p east
+node 507 /p west
+node 406 /p north
 
-node 507
-/p west
-
-node 406
-/p north
-
+\ ram control node
 node 506
-/b north /p north
-
+ /b north /p north
 : addr  ( -- o )
  \ fetch byte address 0-383
  \ set A to bank
  \ o to offset 0-63
    dup 2/ 2/ 2/ 2/ 2/ 2/
-   .. tab
+     tab
     , west
     , south
     , east
 
 : tab
-    pop + a! @ a! 63 and ;
+    pop +, a! @ a! 63 and ;
+
 : read
     @b addr
     { @p a! @ !p } ! !
@@ -39,7 +51,7 @@ node 506
   { @p a! @ !p } ! !
   2/ 2* or                \ low bit of addr
   2* 2* 2*                \ 0 or 8
-  push @ hibyte
+  push @ next: hibyte
 
 : lo8
    255 and !b ;
@@ -59,36 +71,37 @@ node 506
     { @p a! dup } ! !
     { or ! } !
     1 . +
-  next ;
+ next ;
 
+\ test section ------------------
 
 node 606 \ test node
-/a south
+/a south /b north
 : write ( v a - )
    { write@506 } ! ! ! ;
-
 : read ( a - v )
   { read@506 } ! ! @ ;
-
 : erase ( a n - )
-\ . !!break
   { erase@506 } ! ! ! ;
 
+: out !b ;
 : main
-\   111 0 write
-\   222 1 write
-
+\ write a=a*a, for each address a in ram
 191 for
-  pop dup push dup write
-  next
-60 20 erase
+  pop dup push
+  dup dup dup + over write
+next
 
-10 read
-    ( . !!printT )
+\ read and print values
+191 for
+  pop dup push dup read out
+next
 
-
-warm ;
-
-node 705
+node 708
+/a west
+include 708serial.ga
 : main
-warm
+191 for @ send next exit
+
+node 706 wire south east
+node 707 wire west east
