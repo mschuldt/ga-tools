@@ -1,0 +1,30 @@
+
+\ see 708serial.ga for description
+
+\ node 708 ASM
+: send ( n - n )
+    dup dup or
+    call _send8
+    drop call _send8
+    call _send8
+: _send8 ( n - n )
+    dup dup or
+    call _send1
+    @p push
+    7
+: _loop
+    dup call _send1
+    2/ next _loop
+    @p
+    1
+: _send1 ( n )
+    @p and @p
+    1
+    3
+    or !b @p
+    unext_baud
+    push
+    unext ;
+: exit
+ @p jump _send8
+ 1
