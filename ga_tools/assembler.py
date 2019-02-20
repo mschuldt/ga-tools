@@ -39,7 +39,7 @@ for op in opcodes:
 def start_def(p):
     name = p.read_word()
     if name in directives:
-        throw_error("name '{}' is reserved {} (directive)".format(name))
+        throw_error("name '{}' is reserved (directive)".format(name))
     # Removed this check for the SRAM code from greenarrays
     # elif name in node.rom_names:
     #     throw_error("name '{}' already defined (rom)".format(name))
