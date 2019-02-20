@@ -4,7 +4,7 @@ from .assembler import *
 from .ga_serial import *
 from .bootstream import *
 
-version = 0.1
+version = 0.2
 
 
 def chip_json(chip, bootstream_type=None, simulation=False):

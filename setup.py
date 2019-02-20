@@ -3,7 +3,7 @@
 from distutils.core import setup, Extension
 import sys
 
-version = '0.1'
+version = '0.2'
 
 assert not sys.version_info.major < 3, 'ga-tools requires python3'
 
