@@ -119,7 +119,7 @@ if print_json:
     bs = None
     if args.bootstream is not None:
         bs = bootstream_type
-    data = chip.json(bs, args.sim is not None)
+    data = ga_tools.chip_json(chip, bs, args.sim is not None)
     data['version'] = ga_tools.version
     data['file'] = os.path.abspath(args.file)
     dump = json.dumps(data)
@@ -141,7 +141,7 @@ if not args.port:
     print('Error: --port argument is required')
     exit()
 
-chip.set_serial(args.port[0], args.baud[0])
-chip.write_bootstream(bootstream_type)
+serial = ga_tools.GA144Serial(chip, args.port[0], args.baud[0])
+serial.write_bootstream(bootstream_type)
 if args.no_listen is None:
-    chip.serial.listen()
+    serial.listen()

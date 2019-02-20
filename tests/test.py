@@ -459,9 +459,9 @@ def disasm_ram(node, expect):
     print('ram=', node)
     print()
 
-def cmp_json(asm_type, name, node, expect):
-    json = node.json()['nodes']
     #print('json:', json)
+def cmp_json(asm_type, name, chip, expect):
+    json = ga_tools.chip_json(chip)['nodes']
     for coord in expect.keys():
         if coord not in json:
             msg =  "key '{}' not found".format(coord)
@@ -495,7 +495,7 @@ def cmp_values(value, expect, test):
 def case(name, aforth, asm, expect, fn=lambda chip: True):
     print('TEST', name)
     global tests_run
-    ga_tools.reset()
+    ga_tools.clear_chips()
     if aforth:
             ga_tools.include_string('chip test_aforth\n'
                                     + aforth, __file__)

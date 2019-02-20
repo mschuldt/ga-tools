@@ -5,8 +5,6 @@
 chips = {} # maps names to GA144 instances
 
 from .defs import *
-from .ga_serial import *
-from .bootstream import *
 from .f18a_asm import *
 from .ga144_rom import get_node_rom
 from .word import Word
@@ -17,7 +15,6 @@ class GA144:
         self.nodes = {}
         self.current_node = None
         chips[name] = self
-        self.serial = None
 
     def node(self, coord):
         n = self.nodes.get(coord)
@@ -26,14 +23,6 @@ class GA144:
             self.set_rom(n)
             self.nodes[coord] = n
         return n
-
-    def set_serial(self, port, speed):
-        self.serial = GA144Serial(port, speed)
-
-    def write_bootstream(self, bootstream_type):
-        assert(self.serial)
-        bs = make_bootstream(bootstream_type, self)
-        self.serial.write_bootstream(bs.stream())
 
     def set_node(self, coord):
         if self.current_node == coord:
@@ -81,16 +70,6 @@ class GA144:
             if node.stream:
                 del self.nodes[coord]
 
-    def json(self, bootstream_type=None, simulation=False):
-        data = {'nodes': {coord:node.json() for coord, node
-                          in self.nodes.items()}}
-        if bootstream_type:
-            bs = make_bootstream(bootstream_type, self)
-            data['bootstream'] = {'type':bootstream_type,
-                                  'node': bs.start_coord,
-                                  'stream': bs.stream(not simulation)}
-        return data
-
     def print_size(self):
         print('Node  Size  Percent')
         print('-------------------')
@@ -109,6 +88,6 @@ def get_chip(name=None):
     chips = list(get_chips().values())
     return len(chips) and chips[0]
 
-def reset():
+def clear_chips():
     global chips
     chips = {}
