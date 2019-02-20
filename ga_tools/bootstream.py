@@ -150,6 +150,17 @@ class AsyncBootstream(Bootstream):
             new.append(((w >> 10) & 0xff) ^ 0xff)
         return new
 
+class SyncBootstream(Bootstream):
+    # Sync bootstream for loading in node 300
+    def __init__(self, chip):
+        super(SyncBootstream, self).__init__(chip)
+        #path0 from DB004 page 31
+        swse = [SOUTH] + [WEST]*16 + [SOUTH] + [EAST]*16
+        sw = [SOUTH] + [WEST]*17
+        self.path = ([NORTH]*4 + [EAST]*17 + swse + swse + sw
+                     + [SOUTH] + [EAST]*17 + sw)
+        self.start_coord = 300
+
 class AsyncBootstream_GA4(AsyncBootstream):
     # Async bootstream for loading into GA4 node 0
     def __init__(self, chip):
@@ -160,6 +171,8 @@ class AsyncBootstream_GA4(AsyncBootstream):
 def make_bootstream(bootstream_type, chip):
     if bootstream_type == 'async':
         return AsyncBootstream(chip)
+    if bootstream_type == 'sync':
+        return SyncBootstream(chip)
     if bootstream_type == 'ga4':
         return AsyncBootstream_GA4(chip)
     raise Exception('Invalid bootstream type: ' + str(bootstream_type))
