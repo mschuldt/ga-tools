@@ -10,14 +10,14 @@ They support two forms of assembly, bootstream generation and loading.
 1. [Installation](#Installation)
 2. [First program](#First-program)
 3. [Usage](#Usage)
+   1. [Use with Greenarrays evalboard](#Use-with-Greenarrays-evalboard)
 4. [Assembly syntax](#Assembly-syntax)
    1. [Aforth syntax](#aforth-syntax)
    2. [ASM syntax](#ASM-syntax)
-5. [Bootstreams](#Bootstreams)
-6. [JSON output](#JSON-output)
-7. [Documentation](#Documentation)
-8. [Example code](#Example-code)
-9. [GA144 Simulation](#GA144-Simulation)
+5. [Boot streams](#Boot-streams)
+6. [Documentation](#Documentation)
+7. [Example code](#Example-code)
+8. [GA144 Simulation](#GA144-Simulation)
 
 # Installation
 To install from pypi, run: `pip3 install ga-tools`
@@ -46,8 +46,8 @@ for each node alongside its disassembly.
 ## Program loading
 `ga FILE.ga --port NAME` streams the program into serial port NAME.
 
-Use `--bootstream TYPE` to specify the bootstream type, default is 'async'.
-See [Bootstreams](#Bootstreams) for more on the different bootstream types.
+Use `--bootstream TYPE` to specify the boot stream type, default is 'async'.
+See [Boot streams](#Boot_streams) for more on the different boot stream types.
 
 By default `ga` will listen for data being sent back from the ga144,
 use option `--no-listen` to disable that.
@@ -59,6 +59,17 @@ use option `--no-listen` to disable that.
 The bootstream is included with the `--bootstream TYPE` option.
 
 Use the `--outfile NAME` option to direct the JSON output to a file.
+
+## Use with Greenarrays evalboard
+
+To load code into the target chip via port A, or into the host
+chip via port C, use the async bootstream:
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream async`
+
+To load code into the target chip via port A, use the async-target
+bootstream:
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream async-target`
+
 
 ## Disabling optimization
 The `--disable-0-opt` option prevents compiling '0' as 'dup dup or'.
@@ -103,10 +114,26 @@ Each node that uses the asm syntax must be marked with `asm`.
 `node`, `chip`, and other directives must start on a new line.
 
 TODO
-# Bootstreams
-TODO
-# JSON output
-TODO
+# Boot streams
+
+A Boot stream is an instruction stream used to load programs
+into the ga144.
+You can read about the boot protocols [here](http://www.greenarraychips.com/home/documents/greg/BOOT-02.pdf)
+
+You need to pick the correct boot stream type depending
+what node you are loading the code into, and the chip topology
+when using multiple chips.
+
+The following boot stream types are supported:
+ - `async` Asynchronous serial boot for node 708
+ - `async-target` For loading code into node 300 via another ga144
+    which is loaded from node 708. Use this for the target chip
+    on the Greenarrrays evalboard.
+    Currently this only allows loading code into the target chip,
+    both chips cannot be programmed at once.
+ - `sync` 2-wire synchronous boot for loading code into node 300.
+    Used by the async-target stream
+
 # Documentation
 
 Greenarrays [documentation](http://www.greenarraychips.com/home/documents/index.html) is the valuable resource.
@@ -136,9 +163,9 @@ After installation of that simulator, it can be run with:
 `ga FILENAME --sim`
 
 If the `--bootstream` option is provided it will simulate the
-loading of the entire bootstream.This is disabled by default
+loading of the entire boot stream.This is disabled by default
 as it's not usually interesting and is very slow.
-The bootstream is only supported through node 708 in simulation.
+The boot stream is only supported through node 708 in simulation.
 
 # Example code
 The examples/ directory provides numerous example programs
@@ -176,7 +203,8 @@ know arrayforth or if you want to use the Greenarrays documentation.
 # Other GA144 tools
 
  * ga144tools [https://github.com/jamesbowman/ga144tools](https://github.com/jamesbowman/ga144tools)
-   - Assembler similar to the ASM supported here
+   - Assembler similar to the ASM supported here.
+   - Interesting examples including code for virtual machines and VGA.
    - Includes a flash based virtual machine and compiler for it.
 
  * Chlorophyll [https://github.com/mangpo/chlorophyll](https://github.com/mangpo/chlorophyll)

@@ -1,6 +1,6 @@
 # Examples
 
-## fibonacci sequence
+## fibonacci.ga
 
 Prints the first 15 numbers of the Fibonacci sequence
 
@@ -24,7 +24,7 @@ example reading and writing SRAM
 Simple example showing one way of implementing variables
 
 ## counter.ga
-Uses a crystal to maintain time. 
+Uses a crystal to maintain time.
 Prints counter and debug values over serial.
 
 ## fast-ram-node.ga
