@@ -240,12 +240,34 @@ class AsyncTargetBootstream():
             s = self.loader.sget_convert(s)
         return s
 
-def make_bootstream(bootstream_type, chip):
+class AsyncHostTargetBootstream():
+    # bootstream for loading both 'host' and 'target' chips
+    def __init__(self, chips):
+        assert len(chips) == 2
+        chipmap = {c.name:c for c in chips}
+        if 'target' not in chipmap or 'host' not in chipmap:
+            print('Mulitple chips must have names "host" and "target"')
+            exit()
+        self.host = AsyncBootstream(chipmap['host'])
+        self.target = AsyncTargetBootstream(chipmap['target'])
+
+    def stream(self, serial_convert=True):
+        host_stream = self.host.stream(serial_convert)
+        target_stream = self.target.stream(serial_convert)
+        return target_stream + host_stream
+
+def make_bootstream(bootstream_type, chips):
+    chip = chips[0]
+    multiple_chips = len(chips) > 1
     if bootstream_type == '708':
+        assert not multiple_chips
         return AsyncBootstream(chip)
     if bootstream_type == '300':
+        assert not multiple_chips
         return SyncBootstream(chip)
     if bootstream_type == '708-300':
+        if multiple_chips:
+            return AsyncHostTargetBootstream(chips)
         return AsyncTargetBootstream(chip)
     if bootstream_type == 'ga4':
         return AsyncBootstream_GA4(chip)
