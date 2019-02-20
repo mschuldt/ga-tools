@@ -1,5 +1,6 @@
 
 from .defs import *
+from .assembler import compile_string
 
 class Bootstream:
     def __init__(self, chip):
@@ -116,7 +117,7 @@ class Bootstream:
         code.extend(boot)
         return [start, 0, len(code)] + code
 
-    def stream(self):
+    def stream(self, _=None):
         # creates the bootstream
         s = self.head_frame()
         s.extend(self.tail_frame())
@@ -168,11 +169,73 @@ class AsyncBootstream_GA4(AsyncBootstream):
         self.path = (NORTH, EAST, SOUTH)
         self.start_coord = 0
 
+host_loader_code  = """
+chip __host_loader__
+node 608 wire north west
+node 607 wire east west
+node 606 wire east west
+node 605 wire east west
+node 604 wire east west
+node 603 wire east west
+node 602 wire east west
+node 601 wire east west
+node 600 wire east south
+node 500  0x20000 io b! !b
+ 10000 for . . next
+ 0 !b
+ north a! south b!
+ : loop 0x3ffff for @ !b unext loop ;
+node 400 wire north south
+node 300
+ ( reference: block 632 )
+: dly !b 32 for unext ;
+: 1bt dup dly 0x10000 or dly ;
+: c+d+ 0x30003 1bt ; ( set clock high, data high, etc)
+: c+d- 0x30002 1bt ;
+: c-d+ 0x20003 1bt ;
+: c-d- 0x20002 1bt ;
+: bit0
+   -if c+d+ ; then c+d- ;
+: bit1
+   -if c-d+ ; then c-d- ;
+: send
+  8 for
+    bit0 2*
+    bit1 2*
+  next
+: loop
+ @ send loop ;
+: main
+ north a! io b!
+ @ 0x30000 dly send loop ;
+"""
+
+class AsyncTargetBootstream(AsyncBootstream):
+      # bootstream that is loaded into target chip through
+      # node 300 sync port
+    def __init__(self, chip):
+        self.target = SyncBootstream(chip)
+        chips = compile_string(host_loader_code)
+        target = chips['__host_loader__']
+        super(AsyncTargetBootstream, self).__init__(target)
+
+    def stream(self, serial_convert=True):
+        bs = self.head_frame()
+        target_stream = self.target.stream()
+        addr = self.start_node().port_addr(SOUTH)
+        target_bs = [0, addr, len(target_stream)] + target_stream
+        s = bs + target_bs
+        if serial_convert:
+            s = self.sget_convert(s)
+        return s
+
 def make_bootstream(bootstream_type, chip):
     if bootstream_type == 'async':
         return AsyncBootstream(chip)
     if bootstream_type == 'sync':
         return SyncBootstream(chip)
+    if bootstream_type == 'async-target':
+        return AsyncTargetBootstream(chip)
     if bootstream_type == 'ga4':
         return AsyncBootstream_GA4(chip)
     raise Exception('Invalid bootstream type: ' + str(bootstream_type))
