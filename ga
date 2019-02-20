@@ -86,7 +86,7 @@ if not args.file:
     parser.print_help()
     exit()
 
-ga_tools.set_baud(args.baud[0])
+ga_tools.set_baud(int(args.baud[0]))
 
 ga_tools.include_file(args.file)
 ga_tools.do_compile()
