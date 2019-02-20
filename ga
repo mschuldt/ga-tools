@@ -61,11 +61,6 @@ if args.version is not None:
     print(':::GA*Tools', ga_tools.version)
     exit()
 
-bootstream_type = args.bootstream
-if bootstream_type is None:
-    bootstream_type = '708'
-else:
-    bootstream_type = args.bootstream[0]
 
 print_json = args.json is not None
 print_pretty = args.print is not None or args.print_simple is not None
@@ -99,6 +94,12 @@ if len(chips) > 2:
 multiple_chips = len(chips) > 1
 if not chips:
     exit() # empty file
+
+bootstream_type = args.bootstream
+if bootstream_type is None:
+    bootstream_type = '708-300' if multiple_chips else '708'
+else:
+    bootstream_type = args.bootstream[0]
 
 if print_size:
     for chip in chips:
