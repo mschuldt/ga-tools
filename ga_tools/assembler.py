@@ -416,6 +416,18 @@ def do_compile():
     for chip in get_chips().values():
         chip.compile_nodes()
 
+def compile_file(filename):
+    clear_chips()
+    include_file(filename)
+    do_compile()
+    return get_chips()
+
+def compile_string(filename):
+    clear_chips()
+    include_string(filename)
+    do_compile()
+    return get_chips()
+
 def print_nodes(simple=False, coord=None):
     chips = get_chips()
     print_names = len(chips) > 1
