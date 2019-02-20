@@ -256,9 +256,15 @@ class AsyncHostTargetBootstream():
         target_stream = self.target.stream(serial_convert)
         return target_stream + host_stream
 
+bootstream_aliases = { 'async' : '708',
+                       'async-target' :'708-300',
+                       'target': '708-300' }
+
 def make_bootstream(bootstream_type, chips):
     chip = chips[0]
     multiple_chips = len(chips) > 1
+    bootstream_type = bootstream_aliases.get(bootstream_type,
+                                             bootstream_type)
     if bootstream_type == '708':
         assert not multiple_chips
         return AsyncBootstream(chip)
