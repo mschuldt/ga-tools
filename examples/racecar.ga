@@ -1,0 +1,41 @@
+
+\ Every node is a wire forming a loop that weaves its way
+\ through the chip. The number 1 is the race car, it
+\ races around the chip on its wire track.
+
+\ Node 517 passes the number and inverts pin 517.17
+\ allowing us to measure the time to complete one lap.
+
+node 517 \ J36.2
+: pin io b! !b ;
+: pass west b! @ !b ;
+: main south a! west b! 1 !b
+: loop pass 0x30000 pin pass 0x20000 pin loop ;
+\ 840Khz
+
+node 1-16,202-216,402-416,602-616
+wire west east
+
+node 102-116,302-316,502-516,701-716
+wire east west
+
+node 17,217,417,617
+wire west north
+
+node 117,317,717
+wire south west
+
+node 101,301,501
+wire east north
+
+node 201,401,601
+wire south east
+
+node 700
+wire east south
+
+node 600-100
+wire north south
+
+node 0
+wire north east

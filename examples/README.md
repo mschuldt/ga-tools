@@ -30,6 +30,10 @@ Prints counter and debug values over serial.
 ## fast-ram-node.ga
 60 word RAM node with small client code (2 words)
 
+## racecar.ga
+An example using all the nodes. Used to measure the time to
+send a number around the chip in a loop.
+
 # library examples
 
 ## 708serial.ga
