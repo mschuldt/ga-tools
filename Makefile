@@ -5,6 +5,10 @@ all:
 install:
 	python3 setup.py install
 
+upload:
+	python3 setup.py sdist
+	twine upload dist/*
+
 test:
 	python3 tests/test.py
 
@@ -12,3 +16,4 @@ test:
 
 clean:
 	rm -rf build
+	rm -rf dist
