@@ -46,7 +46,7 @@ for each node alongside its disassembly.
 ## Program loading
 `ga FILE.ga --port NAME` streams the program into serial port NAME.
 
-Use `--bootstream TYPE` to specify the boot stream type, default is 'async'.
+Use `--bootstream TYPE` to specify the boot stream type, default is '708'.
 See [Boot streams](#Boot_streams) for more on the different boot stream types.
 
 By default `ga` will listen for data being sent back from the ga144,
@@ -63,13 +63,12 @@ Use the `--outfile NAME` option to direct the JSON output to a file.
 ## Use with Greenarrays evalboard
 
 To load code into the target chip via port A, or into the host
-chip via port C, use the async bootstream:
-`ga FILE.ga --port /dev/ttyUSB0 --bootstream async`
+chip via port C, use the '708' boot stream:
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream 708`
 
-To load code into the target chip via port A, use the async-target
-bootstream:
-`ga FILE.ga --port /dev/ttyUSB0 --bootstream async-target`
-
+To load code into the target chip via port A, use the '708-300'
+boot stream:
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream 708-300`
 
 ## Disabling optimization
 The `--disable-0-opt` option prevents compiling '0' as 'dup dup or'.
@@ -124,15 +123,17 @@ You need to pick the correct boot stream type depending
 what node you are loading the code into, and the chip topology
 when using multiple chips.
 
-The following boot stream types are supported:
- - `async` Asynchronous serial boot for node 708
- - `async-target` For loading code into node 300 via another ga144
+The boot streams names for the `--bootstream` option are named
+after the node they are loaded into.
+The following types are supported:
+ - `708` Asynchronous serial boot.
+ - `708-300` For loading code into node 300 via another ga144
     which is loaded from node 708. Use this for the target chip
     on the Greenarrrays evalboard.
     Currently this only allows loading code into the target chip,
     both chips cannot be programmed at once.
- - `sync` 2-wire synchronous boot for loading code into node 300.
-    Used by the async-target stream
+ - `300` 2-wire synchronous boot. Used by the 708-300 stream
+
 
 # Documentation
 

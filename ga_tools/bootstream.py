@@ -230,11 +230,11 @@ class AsyncTargetBootstream(AsyncBootstream):
         return s
 
 def make_bootstream(bootstream_type, chip):
-    if bootstream_type == 'async':
+    if bootstream_type == '708':
         return AsyncBootstream(chip)
-    if bootstream_type == 'sync':
+    if bootstream_type == '300':
         return SyncBootstream(chip)
-    if bootstream_type == 'async-target':
+    if bootstream_type == '708-300':
         return AsyncTargetBootstream(chip)
     if bootstream_type == 'ga4':
         return AsyncBootstream_GA4(chip)

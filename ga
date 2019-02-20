@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('file', nargs='?', help='input file')
 parser.add_argument('--bootstream',
                     nargs=1,
-                    help='Bootstream type. Default=async')
+                    help='Bootstream type. Default=708')
 parser.add_argument('--port',
                     nargs=1,
                     help='Serial port')
@@ -63,7 +63,7 @@ if args.version is not None:
 
 bootstream_type = args.bootstream
 if bootstream_type is None:
-    bootstream_type = 'async'
+    bootstream_type = '708'
 else:
     bootstream_type = args.bootstream[0]
 

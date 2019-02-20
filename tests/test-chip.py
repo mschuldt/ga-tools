@@ -32,7 +32,7 @@ chip = ga_tools.get_chip()
 
 chip.set_serial(args.port[0], args.baud[0])
 
-chip.write_bootstream('async')
+chip.write_bootstream('708')
 chip.serial.gather() # TODO: timeout
 chip.serial.data
 assert chip.serial.data == [708, 5]
