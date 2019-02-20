@@ -433,7 +433,7 @@ def print_nodes(simple=False, coord=None):
     print_names = len(chips) > 1
     for name, chip in chips.items():
         if print_names:
-            print('chip:', name)
+            print('\n\nchip:', name)
         nodes = list(chip.nodes.values())
         nodes.sort(key=lambda x: x.coord)
         for node in nodes:

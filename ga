@@ -92,17 +92,17 @@ ga_tools.include_file(args.file)
 ga_tools.do_compile()
 
 chips = list(ga_tools.get_chips().values())
-if len(chips) > 1:
-    #TODO: Support multiple chips
-    raise Exception('Multiple chips are not supported yet')
 
+if len(chips) > 2:
+    raise Exception('More than 2 chips are not supported yet')
+
+multiple_chips = len(chips) > 1
 if not chips:
     exit() # empty file
 
-chip = chips[0]
-
 if print_size:
-    chip.print_size()
+    for chip in chips:
+        chip.print_size(multiple_chips)
     exit()
 
 def do_pretty_print():
@@ -113,11 +113,16 @@ if print_pretty:
     exit()
 
 if args.sim is not None:
+    if multiple_chips:
+        print('Multiple chips are not supported in simulation')
+        exit()
     import tempfile
     print_json = True
     outfile = tempfile.NamedTemporaryFile().name
 
 if print_json:
+    #TODO: json for multiple chips
+    chip = chips[0]
     import json
     bs = None
     if args.bootstream is not None:
@@ -144,7 +149,7 @@ if not args.port:
     do_pretty_print()
     exit()
 
-serial = ga_tools.GA144Serial(chip, args.port[0], args.baud[0])
+serial = ga_tools.GA144Serial(chips, args.port[0], args.baud[0])
 serial.write_bootstream(bootstream_type)
 if args.no_listen is None:
     serial.listen()

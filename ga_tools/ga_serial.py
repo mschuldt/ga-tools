@@ -3,8 +3,8 @@ from serial import Serial
 from .bootstream import make_bootstream
 
 class GA144Serial:
-    def __init__(self, chip, port, speed):
-        self.chip = chip
+    def __init__(self, chips, port, speed):
+        self.chips = chips
         self.serial = Serial(port, speed)
         self.serial.reset_input_buffer()
 
@@ -22,7 +22,7 @@ class GA144Serial:
         serial.flush()
 
     def write_bootstream(self, bootstream_type):
-        bs = make_bootstream(bootstream_type, self.chip)
+        bs = make_bootstream(bootstream_type, self.chips)
         self.send_bootstream(bs.stream())
 
     def read_n(self, n):

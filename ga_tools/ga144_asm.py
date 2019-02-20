@@ -70,9 +70,11 @@ class GA144:
             if node.stream:
                 del self.nodes[coord]
 
-    def print_size(self):
+    def print_size(self, print_name=False):
         print('Node  Size  Percent')
         print('-------------------')
+        if print_name:
+            print('chip', self.name)
         nodes = list(self.nodes.items())
         nodes.sort()
         for coord, node in nodes:
