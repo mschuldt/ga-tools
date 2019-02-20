@@ -52,6 +52,9 @@ parser.add_argument('--node',
 parser.add_argument('--sim',
                     nargs=-1,
                     help='Run the GA144 simulator')
+parser.add_argument('--dis',
+                    nargs=1,
+                    help='Disassemble an 18-bit word')
 parser.add_argument('--version',
                     nargs=-1,
                     help='GA-tools version')
@@ -61,6 +64,10 @@ if args.version is not None:
     print(':::GA*Tools', ga_tools.version)
     exit()
 
+if args.dis:
+    word = int(args.dis[0]) & 0x3ffff
+    print(word, '   ', ga_tools.disasm_to_str(word))
+    exit()
 
 print_json = args.json is not None
 print_pretty = args.print is not None or args.print_simple is not None
