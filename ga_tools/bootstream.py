@@ -171,21 +171,26 @@ class AsyncBootstream_GA4(AsyncBootstream):
 
 host_loader_code  = """
 chip __host_loader__
-node 608 wire north west
-node 607 wire east west
-node 606 wire east west
-node 605 wire east west
-node 604 wire east west
-node 603 wire east west
-node 602 wire east west
-node 601 wire east west
-node 600 wire east south
-node 500  0x20000 io b! !b
+node 608
+  north a! west b!
+  ( read stream length and pass a copy next node )
+  @ dup !b
+  ( send stream to next node )
+  for @ !b unext
+node 607 east a! west b! @ dup !b for @ !b unext
+node 606 east a! west b! @ dup !b for @ !b unext
+node 605 east a! west b! @ dup !b for @ !b unext
+node 604 east a! west b! @ dup !b for @ !b unext
+node 603 east a! west b! @ dup !b for @ !b unext
+node 602 east a! west b! @ dup !b for @ !b unext
+node 601 east a! west b! @ dup !b for @ !b unext
+node 600 east a! south b! @ dup !b for @ !b unext
+node 500 0x20000 io b! !b ( reset target chip)
  10000 for . . next
  0 !b
  north a! south b!
- : loop 0x3ffff for @ !b unext loop ;
-node 400 wire north south
+@ dup !b for @ !b unext
+node 400 north a! south b! @ dup !b for @ !b unext
 node 300
  ( reference: block 632 )
 : dly !b 32 for unext ;
@@ -202,31 +207,37 @@ node 300
   8 for
     bit0 2*
     bit1 2*
-  next
-: loop
- @ send loop ;
+  next ;
 : main
  north a! io b!
- @ 0x30000 dly send loop ;
+@ push @ 0x30000 dly send
+pop -1 . + for @ send next
 """
 
-class AsyncTargetBootstream(AsyncBootstream):
+class AsyncTargetBootstream():
       # bootstream that is loaded into target chip through
       # node 300 sync port
     def __init__(self, chip):
         self.target = SyncBootstream(chip)
+        self.loader = None
+
+    def loader_stream(self, length):
         chips = compile_string(host_loader_code)
-        target = chips['__host_loader__']
-        super(AsyncTargetBootstream, self).__init__(target)
+        self.loader = AsyncBootstream(chips['__host_loader__'])
+        return self.loader.head_frame()
+
+    def start_node(self):
+        return self.loader.start_node()
 
     def stream(self, serial_convert=True):
-        bs = self.head_frame()
         target_stream = self.target.stream()
+        target_stream = [len(target_stream)-1] + target_stream
+        loader_bs = self.loader_stream(len(target_stream)-1)
         addr = self.start_node().port_addr(SOUTH)
-        target_bs = [0, addr, len(target_stream)] + target_stream
-        s = bs + target_bs
+        target_bs = [0xae, addr, len(target_stream)] + target_stream
+        s = loader_bs + target_bs
         if serial_convert:
-            s = self.sget_convert(s)
+            s = self.loader.sget_convert(s)
         return s
 
 def make_bootstream(bootstream_type, chip):
