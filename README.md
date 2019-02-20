@@ -43,11 +43,17 @@ series before exiting.
 ## Print assembly
 `ga FILE.ga --print` prints a summary of the assembled program
 for each node alongside its disassembly.
+
+Add the `--node N` option to print a single node.
+
 ## Program loading
 `ga FILE.ga --port NAME` streams the program into serial port NAME.
 
 Use `--bootstream TYPE` to specify the boot stream type, default is '708'.
 See [Boot streams](#Boot_streams) for more on the different boot stream types.
+
+`--baud` sets the serial baud rate. Default is 460800.
+The rate can range from 9600bps to 1Mbps.
 
 By default `ga` will listen for data being sent back from the ga144,
 use option `--no-listen` to disable that.
@@ -63,12 +69,12 @@ Use the `--outfile NAME` option to direct the JSON output to a file.
 ## Use with Greenarrays evalboard
 
 To load code into the target chip via port A, or into the host
-chip via port C, use the '708' boot stream:
-`ga FILE.ga --port /dev/ttyUSB0 --bootstream 708`
+chip via port C, use the 'async' boot stream:
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream async`
 
-To load code into the target chip via port A, use the '708-300'
+To load code into the target chip via port A, use the 'target'
 boot stream:
-`ga FILE.ga --port /dev/ttyUSB0 --bootstream 708-300`
+`ga FILE.ga --port /dev/ttyUSB0 --bootstream target`
 
 ## Disabling optimization
 The `--disable-0-opt` option prevents compiling '0' as 'dup dup or'.
@@ -126,13 +132,18 @@ when using multiple chips.
 The boot streams names for the `--bootstream` option are named
 after the node they are loaded into.
 The following types are supported:
- - `708` Asynchronous serial boot.
- - `708-300` For loading code into node 300 via another ga144
-    which is loaded from node 708. Use this for the target chip
-    on the Greenarrrays evalboard.
-    Currently this only allows loading code into the target chip,
-    both chips cannot be programmed at once.
- - `300` 2-wire synchronous boot. Used by the 708-300 stream
+ - `708` (alias `async`) Asynchronous serial boot.
+ - `708-300` (alias `target`) For loading code into node 300 via
+    another ga144 which is loaded from node 708. Use this for the
+    target chip on the Greenarrays evalboard.
+ - `300` 2-wire synchronous boot. Used by the `708-300` stream
+
+The boot stream type defaults to `708` with one chip
+and `708-300` with two chips.
+
+If stream `708-300` is used to load code into both chips,
+they must be named "host" and "target". The "target" chip
+gets its bootstream loaded through the "host" chip.
 
 
 # Documentation
