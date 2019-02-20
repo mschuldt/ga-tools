@@ -105,8 +105,11 @@ if print_size:
     chip.print_size()
     exit()
 
-if print_pretty:
+def do_pretty_print():
     ga_tools.print_nodes(args.print_simple is not None, select_node)
+
+if print_pretty:
+    do_pretty_print()
     exit()
 
 if args.sim is not None:
@@ -138,7 +141,7 @@ if args.sim is not None:
     exit()
 
 if not args.port:
-    print('Error: --port argument is required')
+    do_pretty_print()
     exit()
 
 serial = ga_tools.GA144Serial(chip, args.port[0], args.baud[0])
