@@ -48,15 +48,15 @@
               "\\)"))
 (ga-make-regexp '("b!"))
 
-(defface ga-instruction-face '((((background light)) (:foreground "green"))
+(defface ga-instruction-face '((((background light)) (:foreground "green4"))
                                (((background dark)) (:foreground "green")))
   "Default face for arrayforth instructions")
 
-(defface ga-directive-face '((((background light)) (:foreground "yellow"))
+(defface ga-directive-face '((((background light)) (:foreground "DarkGoldenrod"))
                              (((background dark)) (:foreground "yellow")))
   "Default face for arrayforth compiler directives")
 
-(defface ga-number-face '((((background light)) (:foreground "LightGreen"))
+(defface ga-number-face '((((background light)) (:foreground "green3"))
                           (((background dark)) (:foreground "LightGreen")))
   "Default face for arrayforth numbers")
 
