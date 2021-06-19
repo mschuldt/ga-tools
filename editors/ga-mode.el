@@ -9,10 +9,12 @@
                           ";" "." "-" "+"  "@p" "@b" "@" "b!" "a!"))
 
 (setq ga-ports '("up" "left" "down" "right" "io"
-                 "north" "east" "south" "west"))
+                 "north" "east" "south" "west"
+                 "ldata" "data" "warp" "center" "top" "side" "corner"
+                 ))
 
 (setq ga-directives '( "start" "for" "begin" "then" "here"
-                       "while"  "reclaim" "leap"))
+                       "while"  "reclaim" "leap"  "boot"))
 
 (setq ga-directives2 '(".." "#swap" "-while" "," "-until"
                        "---u" "--l-" "--lu" "-d--" "-d-u"
