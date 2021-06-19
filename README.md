@@ -55,8 +55,8 @@ See [Boot streams](#Boot_streams) for more on the different boot stream types.
 `--baud` sets the serial baud rate. Default is 460800.
 The rate can range from 9600bps to 1Mbps.
 
-By default `ga` will listen for data being sent back from the ga144,
-use option `--no-listen` to disable that.
+By default `ga` will listen for and print data words sent back from the ga144 after loading the problem.
+To disable that behavior, use option `--no-listen`.
 
 ## Show program size
 `ga FILE --size` prints the RAM usage of each node.
