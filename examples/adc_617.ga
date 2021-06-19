@@ -1,0 +1,46 @@
+
+node 708
+boot io b! south a!
+include 708serial.ga
+
+: main
+555 send
+: loop
+@ send loop ;
+
+node 608
+wire east north
+
+node 609-616
+wire east west
+
+node 617 ASM
+
+: main
+@p a!
+ldata
+@p b!
+io
+
+@p !b
+0x0000
+jump adc
+
+: adc
+    \ sample
+    @p dup push
+    9800
+    ! @ dup
+    unext
+    ! @
+    - . +
+    \ calib
+    @p - . +
+    85010
+    2/ 2/ 2/
+    \ send
+    @p b! !b
+    WEST
+    @p b!
+    io
+   jump adc
