@@ -29,12 +29,14 @@ node 708
 ga_tools.include_string(program)
 ga_tools.do_compile()
 
+
 chip = ga_tools.get_chip()
 
-chip.set_serial(args.port[0], args.baud[0])
 
-chip.write_bootstream('708')
-chip.serial.gather() # TODO: timeout
-chip.serial.data
-assert chip.serial.data == [708, 5]
+serial = ga_tools.GA144Serial([chip], args.port[0], args.baud[0])
+
+serial.write_bootstream('708')
+serial.gather() # TODO: timeout
+
+assert serial.data == [708, 5]
 print('ok')
