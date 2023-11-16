@@ -14,6 +14,7 @@ chip = None
 node = None
 
 directives = {}
+asm_directives = {}
 
 compile_0_as_dup_dup_or = True
 auto_nop_insert = True
@@ -22,9 +23,11 @@ baud=None
 
 node_stack = []
 
-def directive(name):
+def directive(name, asm_supported=False):
     def decorator(fn):
         directives[name] = fn
+        if asm_supported:
+            asm_directives[name] = fn
     return decorator
 
 def op_directive(op):
@@ -35,7 +38,7 @@ def op_directive(op):
 for op in opcodes:
     directives[op] = op_directive(op)
 
-@directive(':')
+@directive(':', True)
 def start_def(p):
     name = p.read_word()
     if name in directives:
@@ -45,7 +48,7 @@ def start_def(p):
     #     throw_error("name '{}' already defined (rom)".format(name))
     node.start_def(name)
 
-@directive('boot')
+@directive('boot', True)
 def _start_boot(_):
     if not node.current_word.empty() or node.current_word.prev:
         throw_error('boot directive must be first in node definition')
@@ -146,12 +149,12 @@ def __until(_):
 def _align(_):
     node.fill_rest_with_nops()
 
-@directive('+cy')
+@directive('+cy', True)
 def _pcy(_):
     node.fill_rest_with_nops()
     node.extended_arith = 0x200
 
-@directive('-cy')
+@directive('-cy', True)
 def _mcy(_):
     node.fill_rest_with_nops()
     node.extended_arith = 0
@@ -200,7 +203,7 @@ def _enable_plus_opt(_):
 def _disable_plus_opt(_):
     optimize_plus(False)
 
-@directive('org')
+@directive('org', True)
 def _org(p):
     node.move_forward(p.read_int())
 
@@ -232,19 +235,19 @@ def _lit(p):
 def _coord(_):
     node.compile_constant(node.coord)
 
-@directive('/a')
+@directive('/a', True)
 def _init_a(p):
     node.init_a = read_ref(p)
 
-@directive('/b')
+@directive('/b', True)
 def _init_b(p):
     node.init_b = read_ref(p)
 
-@directive('/p')
+@directive('/p', True)
 def _init_p(p):
     node.init_p = read_ref(p)
 
-@directive('/io')
+@directive('/io', True)
 def _init_io(p):
     node.init_io = read_ref(p)
 
@@ -376,13 +379,18 @@ def process_aforth(coord, data):
 def process_asm(coord, data):
     node.asm_node = True
     for line in data.tokens:
-        if len(line) == 1 and line[0].value not in op_i:
-            fn = directives.get(line[0].value)
-            if fn:
-                fn(None)
-                continue
         if type(line) is not list:
-            throw_error('why?')
+            throw_error('asm mode parser error: expected type list')
+        if len(line) >= 1:
+            w = line[0].value
+            fn = asm_directives.get(w)
+            if fn:
+                reader = TokenReader(None, line[1:])
+                fn(reader)
+                if reader.index < reader.last:
+                    throw_error('ASM mode directives must be on their own line')
+                continue
+
         ops = [t.value for t in line]
         node.asm_word(ops, add_to_node=True)
 

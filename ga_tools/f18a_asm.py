@@ -309,7 +309,7 @@ class F18a:
         return words
 
     def start_addr(self, with_extended_arith=True):
-        # Returns the start address - address of 'main' or 0
+        # Returns the start address - address of 'main', from '/p', or 0
         w = self.symbols.get('main')
         if w:
             if self.init_p is not None:

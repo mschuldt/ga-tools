@@ -98,7 +98,7 @@ Read about it [here](https://mschuldt.github.io/www.colorforth.com/inst.htm) or 
 Both forms are case insensitive.
 
 ## Aforth syntax
-Aforth provides convient layer above raw assembly,
+Aforth provides convenient layer above raw assembly,
 bringing its syntax closer to that of the Forth.
 It allows reuse of existing code for the ga144 and helps with
 the use and comprehension of the valuable documentation from Greenarrays.
